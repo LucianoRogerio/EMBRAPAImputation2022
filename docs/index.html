@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Home</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EMBRAPAImputation2022</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Home</h1>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-05-05
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>EMBRAPAImputation2022/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220303code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20220303)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220303code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220303)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomLucianoRogerioEMBRAPAImputation2022tree8204f0e1add03ab9a434a870bbd2c720757363f1targetblank8204f0ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/LucianoRogerio/EMBRAPAImputation2022/tree/8204f0e1add03ab9a434a870bbd2c720757363f1" target="_blank">8204f0e</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomLucianoRogerioEMBRAPAImputation2022tree8204f0e1add03ab9a434a870bbd2c720757363f1targetblank8204f0ea" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/LucianoRogerio/EMBRAPAImputation2022/tree/8204f0e1add03ab9a434a870bbd2c720757363f1" target="_blank">8204f0e</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+
+Untracked files:
+    Untracked:  .DS_Store
+    Untracked:  analysis/output.vcf.gz
+    Untracked:  bgzip
+    Untracked:  data/.DS_Store
+    Untracked:  data/DArT2018/
+    Untracked:  data/DArT2020/
+    Untracked:  data/DArT2022/
+    Untracked:  data/GBS/
+    Untracked:  data/data/
+    Untracked:  out.log
+    Untracked:  out.recode.vcf
+    Untracked:  output.log
+    Untracked:  output.recode.vcf
+    Untracked:  output.vcf.gz
+    Untracked:  output/.DS_Store
+    Untracked:  output/DArT2022/
+    Untracked:  output/DCas22_DArt_ReadyForGP_Dos.rds
+    Untracked:  output/out.log
+
+Unstaged changes:
+    Modified:   analysis/index.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML (<code>docs/index.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/LucianoRogerio/EMBRAPAImputation2022/blob/8204f0e1add03ab9a434a870bbd2c720757363f1/analysis/index.Rmd" target="_blank">8204f0e</a>
+</td>
+<td>
+LucianoRogerio
+</td>
+<td>
+2022-03-03
+</td>
+<td>
+Start workflowr project.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="new-imputation-for-embrapa-with-dart-marker-only-and-dart-plus-gbs-markers" class="section level3">
+<h3>New Imputation for EMBRAPA with DArT Marker only and DArT plus GBS Markers</h3>
+<p>Diversity Array Technology LTDA joint all the genotyping data from the four Genotyping Orders that EMBRAPA requested during these six or seven years in one huge file.</p>
+<p>So let’s what we got at the DArT report for EMBRAPA DArT genotyping of 2022</p>
+<pre class="r"><code>library(genomicMateSelectR)
+dir(&quot;data/DArT2022&quot;)
+nskipvcf &lt;- 2
+nskipcounts &lt;- 2
+VCF2022 &lt;- read.table(here::here(&quot;data&quot;, &quot;Report_6902_VCF_Ref_Version6.txt&quot;),
+                      sep = &quot;\t&quot;, header = T, skip = nskipvcf, comment.char = &quot;&quot;)
+Counts2022 &lt;- read.table(here::here(&quot;data&quot;, &quot;SEQ_SNPs_counts_0_Target_extend_Ref.csv&quot;),
+                         sep = &quot;,&quot;, header = T, skip = nskipcounts)
+Counts2022[1:10,1:30]
+VCF2022[1:10,1:30]
+genomicMateSelectR::convertDart2vcf(dartvcfInput = here::here(&quot;data&quot;, &quot;Report_6902_VCF_Ref_Version6.txt&quot;),
+                                    dartcountsInput = here::here(&quot;data&quot;, &quot;SEQ_SNPs_counts_0_Target_extend_Ref.csv&quot;),
+                                    nskipvcf = 2, nskipcounts = 2,
+                                    outName = &quot;output/DCas22_6902&quot;, ncores = 20)</code></pre>
+</div>
+<div id="filtering-the-dart-markers-previously-the-beagle-imputation" class="section level3">
+<h3>Filtering the DArT markers previously the Beagle imputation</h3>
+<pre class="r"><code>library(here); library(tidyverse)
+library(magrittr); library(dplyr)
+
+## Parameters for the Filter function
+inPath &lt;- &quot;output/&quot;
+inName &lt;- &quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_raw&quot;
+outPath &lt;- &quot;output/&quot;
+outName &lt;- &quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered&quot;
+
+FilterLuc &lt;- function(inPath = NULL, inName, outPath = NULL, outName, CRthresh = 0.6){
+    system(paste0(&quot;vcftools --gzvcf &quot;, inPath, inName, &quot;.vcf.gz --freq2 --out &quot;, 
+        outPath, inName))
+    system(paste0(&quot;vcftools --gzvcf &quot;, inPath, inName, &quot;.vcf.gz --missing-site --out &quot;, 
+        outPath, inName))
+    
+    INFO &lt;- read.table(paste0(outPath, inName, &quot;.frq&quot;), stringsAsFactors = F, 
+        header = F, skip = 1) %&gt;%
+      rename(CHROM = V1, POS = V2, N_ALLELES = V3,
+             N_CHR = V4, FREQ1 = V5, FREQ2 = V6)
+    callrate &lt;- read.table(paste0(outPath, inName, &quot;.lmiss&quot;), stringsAsFactors = F, 
+        header = T) %&gt;% dplyr::select(CHR, POS, N_DATA, F_MISS) %&gt;%
+      mutate(CHROM = CHR,
+             CR = 1 - F_MISS,
+             .keep = &quot;unused&quot;)
+    
+    stats2filterOn &lt;- left_join(INFO, callrate)
+    stats2filterOn %&lt;&gt;% dplyr::mutate(FREQ2 = as.numeric(FREQ2)) %&gt;% 
+        dplyr::mutate(MAF = ifelse(FREQ2 &gt; 0.5,
+                                   yes = 1 - FREQ2, no = FREQ2)) %&gt;% 
+      dplyr::select(-FREQ1, -FREQ2)
+    
+    MAFthresh &lt;- (1/max(stats2filterOn$N_DATA, na.rm = T))**2
+    
+    sitesPassingFilters &lt;- stats2filterOn %&gt;%
+      dplyr::filter(MAF &gt;= MAFthresh, CR &gt;= CRthresh) %&gt;%
+      dplyr::select(CHROM, POS)
+    print(paste0(nrow(sitesPassingFilters), &quot; sites passing filter&quot;))
+    write.table(sitesPassingFilters, file = paste0(outPath, inName, 
+        &quot;.sitesPassing&quot;), row.names = F, col.names = F, quote = F)
+    system(paste0(&quot;vcftools --gzvcf &quot;, inPath, inName, &quot;.vcf.gz&quot;, 
+        &quot; &quot;, &quot;--positions &quot;, outPath, inName, &quot;.sitesPassing&quot;, 
+        &quot; &quot;, &quot;--recode --stdout | bgzip -c -@ 24 &gt; &quot;, outPath, 
+        outName, &quot;.vcf.gz&quot;))
+    print(paste0(&quot;Filtering Complete: &quot;, outName))
+}
+
+FilterLuc(inPath=inPath, inName=inName,
+          outPath=outPath, outName=outName,
+          CRthresh = 0.6)</code></pre>
+<div id="download-of-the-raw-filtered-vcf" class="section level5">
+<h5>Download of the Raw Filtered VCF</h5>
+<pre class="bash"><code>cd output/DArT2022
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz .
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.lmiss .
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.frq .
+
+cd ../..</code></pre>
+</div>
+<div id="maf-and-call-rate-of-the-raw-data" class="section level5">
+<h5>MAF and Call Rate of the Raw data</h5>
+<pre class="r"><code>library(tidyverse); library(here)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>here() starts at /Users/lbd54/Documents/GitHub/EMBRAPAImputation2022</code></pre>
+<pre class="r"><code>library(reactable)
+INFO &lt;- read.table(here::here(&quot;output&quot;, &quot;DArT2022&quot;, &quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.frq&quot;),
+                   stringsAsFactors = F, 
+                   header = F, skip = 1) %&gt;%
+  rename(CHROM = V1, POS = V2, N_ALLELES = V3,
+         N_CHR = V4, FREQ1 = V5, FREQ2 = V6)
+callrate &lt;- read.table(here::here(&quot;output&quot;, &quot;DArT2022&quot;, &quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.lmiss&quot;),
+                       stringsAsFactors = F, 
+                       header = T) %&gt;% dplyr::select(CHR, POS, N_DATA, F_MISS) %&gt;%
+  mutate(CHROM = CHR,
+         CR = 1 - F_MISS,
+         .keep = &quot;unused&quot;)
+
+stats2filterOn &lt;- left_join(INFO, callrate)</code></pre>
+<pre><code>Joining, by = c(&quot;CHROM&quot;, &quot;POS&quot;)</code></pre>
+<pre class="r"><code>stats2filterOn %&lt;&gt;% dplyr::mutate(FREQ2 = as.numeric(FREQ2)) %&gt;% 
+  dplyr::mutate(MAF = ifelse(FREQ2 &gt; 0.5,
+                             yes = 1 - FREQ2, no = FREQ2)) %&gt;% 
+  dplyr::select(-FREQ1, -FREQ2)
+MAFthresh &lt;- (1/max(stats2filterOn$N_DATA, na.rm = T))**2
+
+stats2filterOn %&lt;&gt;% filter(!is.na(CHROM), CR &gt;= 0.6, MAF &gt;= MAFthresh) %&gt;% 
+  select(CR, MAF) %&gt;% rename(CallRate = CR) %&gt;% reshape2::melt(.)</code></pre>
+<pre><code>No id variables; using all as measure variables</code></pre>
+<pre class="r"><code>stats2filterOn %&gt;% ggplot(aes(x= value)) + 
+  geom_density() + facet_grid(~variable, scales = &quot;free_x&quot;) + theme_minimal()</code></pre>
+<p><img src="figure/index.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="split-the-vcf-per-chromosome" class="section level3">
+<h3>Split the VCF per chromosome</h3>
+<pre class="r"><code>require(furrr); plan(multisession, workers = 18)
+options(future.globals.maxSize=+Inf); options(future.rng.onMisuse=&quot;ignore&quot;)
+  
+vcfIn&lt;-here::here(&quot;output/&quot;,&quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz&quot;)
+filters&lt;-&quot;--minDP 4 --maxDP 50&quot; # because using GT not PL for impute (Beagle5)
+outPath&lt;-here::here(&quot;output/&quot;)
+outSuffix&lt;-&quot;DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered&quot;
+
+future_map(1:18,
+           ~genomicMateSelectR::splitVCFbyChr(Chr=.,
+                                              vcfIn=vcfIn,filters=filters,
+                                              outPath=outPath,
+                                              outSuffix=outSuffix))
+plan(sequential)</code></pre>
+</div>
+<div id="imputation-dart-markers-only" class="section level3">
+<h3>Imputation DArT markers only</h3>
+<p>Imputation is performed by chromosome</p>
+<pre class="bash"><code>java -Xms2g -Xmx [maxmem] -jar /programs/beagle/beagle.jar gt= [targetVCF] map= [mapFile] out= [outName] nthreads= [nthreads] impute= [impute]  ne=  [ne]</code></pre>
+<pre class="r"><code>runBeagle5Luc &lt;- function(targetVCF, mapFile, outName, nthreads, maxmem = &quot;500g&quot;, 
+    impute = TRUE, ne = 1e+05, samplesToExclude = NULL){
+  system(paste0(&quot;java -Xms2g -Xmx&quot;, maxmem, &quot; -jar /programs/beagle/beagle.jar &quot;, 
+                &quot;gt=&quot;, targetVCF, &quot; &quot;, &quot;map=&quot;, mapFile, &quot; &quot;,
+                &quot;out=&quot;, outName, &quot; &quot;, &quot;nthreads=&quot;, nthreads, 
+                &quot; impute=&quot;, impute, &quot; ne=&quot;, ne,
+                ifelse(!is.null(samplesToExclude),
+                       paste0(&quot; excludesamples=&quot;, samplesToExclude), &quot;&quot;)))}
+
+targetVCFpath&lt;-here::here(&quot;output/&quot;) # location of the targetVCF
+mapPath&lt;-here::here(&quot;data&quot;, &quot;CassavaGeneticMapV6updated/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+outSuffix&lt;-&quot;DCas22_6902&quot;
+
+library(tidyverse); library(magrittr); 
+purrr::map(1:18,
+           ~runBeagle5Luc(targetVCF=paste0(targetVCFpath,&quot;chr&quot;,.,
+                                           &quot;_DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz&quot;),
+                          mapFile=paste0(mapPath,&quot;chr&quot;,.,
+                                         &quot;_cassava_cM_pred.v6_91019.map&quot;),
+                          outName=paste0(outPath,&quot;chr&quot;,.,
+                                         &quot;_DCas22_6902_DArT_imputed&quot;),
+                          nthreads=110))</code></pre>
+<p>Organize the Beagle logs in a directory</p>
+<pre class="bash"><code>cd ~/Desktop/Genotyping/DArT/EMBRAPA/DCas22_6902/output/
+mkdir BeagleLogs
+cp *_DCas22_6902_DArT_imputed.log BeagleLogs/.
+rm *_DCas22_6902_DArT_imputed.log</code></pre>
+</div>
+<div id="post-imputation-filter" class="section level3">
+<h3>Post Imputation Filter</h3>
+<p>Standard post-imputation filter: <span class="math inline">\(CR≥0.6\)</span>, <span class="math inline">\(MAF≥(1/7827)^2\)</span>.</p>
+<p>Loop to filter all 18 VCF files in parallel</p>
+<pre class="r"><code>inPath&lt;-here::here(&quot;output/&quot;)
+outPath&lt;-here::here(&quot;output/&quot;)
+
+require(furrr); plan(multisession, workers = 18)
+
+future_map(1:18,
+           ~FilterLuc(inPath=inPath,
+                      inName=paste0(&quot;chr&quot;,.,&quot;_DCas22_6902_DArT_imputed&quot;),
+                      outPath=outPath,
+                      outName=paste0(&quot;chr&quot;,.,&quot;_DCas22_6902_DArT_imputedAndFiltered&quot;),
+                      CRthresh = 0.6))
+plan(sequential)</code></pre>
+<p>Let’s check what we got</p>
+<pre class="r"><code>purrr::map(1:18,~system(paste0(&quot;zcat &quot;,here::here(&quot;output/&quot;),&quot;chr&quot;,.,&quot;_DCas22_6902_DArT_imputedAndFiltered.vcf.gz | wc -l&quot;)))</code></pre>
+<pre><code>Chr 1 - 1064
+Chr 2 - 696
+Chr 3 - 682
+Chr 4 - 682
+Chr 5 - 634
+Chr 6 - 656
+Chr 7 - 428
+Chr 8 - 532
+Chr 9 - 520
+Chr 10 - 664
+Chr 11 - 591
+Chr 12 - 468
+Chr 13 - 508
+Chr 14 - 707
+Chr 15 - 516
+Chr 16 - 437
+Chr 17 - 543
+Chr 18 - 480</code></pre>
+</div>
+<div id="formats-for-gs-and-gwas-analysis" class="section level3">
+<h3>Formats for GS and GWAS Analysis</h3>
+<pre class="r"><code>for(i in 1:18){
+  system(paste0(&quot;gzcat chr&quot;, i, &quot;_DCas22_6902_DArT_imputedAndFiltered.vcf.gz&quot;,
+  &quot; &gt; &quot;,
+  &quot;chr&quot;, i, &quot;_DCas22_6902_DArT_imputedAndFiltered.vcf&quot;))
+}
+
+VCFFile &lt;- tibble()
+inPath &lt;- &quot;output/DArT2022/&quot;
+outPath &lt;- &quot;output/DArT2022/&quot;
+outName &lt;- &quot;AllChrom_DArT_ReadyForGP_2022May04&quot;
+
+for(i in 1:18){
+  x &lt;- read.table(file = paste0(inPath, &quot;chr&quot;, i, &quot;_DCas22_6902_DArT_imputedAndFiltered.vcf&quot;),
+                  header = T, comment.char = &quot;&quot;, skip = 9, sep = &quot;\t&quot;)
+  print(paste0(&quot;chr - &quot;, i, &quot; - NSNPs &quot;, nrow(x)))
+  VCFFile &lt;- rbind(VCFFile, x)
+}
+
+VCFFile %&lt;&gt;% rename(`#CHROM` = X.CHROM)
+
+# Header ----------------------------------------
+header&lt;-c(&quot;##fileformat=VCFv4.2&quot;,
+          &quot;##filedate=20220504&quot;,
+          &quot;##source=\&quot;beagle.28Sep18.793.jar\&quot;&quot;,
+          &quot;##INFO=&lt;ID=AF,Number=A,Type=Float,Description=\&quot;Estimated ALT Allele Frequencies\&quot;&gt;&quot;,
+          &quot;##INFO=&lt;ID=DR2,Number=1,Type=Float,Description=\&quot;Dosage R-Squared: estimated squared correlation between estimated REF dose [P(RA) + 2*P(RR)] and true REF dose\&quot;&gt;&quot;,
+          &quot;##INFO=&lt;ID=IMP,Number=0,Type=Flag,Description=\&quot;Imputed marker\&quot;&gt;&quot;,
+          &quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=\&quot;Genotype\&quot;&gt;&quot;,
+          &quot;##FORMAT=&lt;ID=DS,Number=A,Type=Float,Description=\&quot;estimated ALT dose [P(RA) + P(AA)]\&quot;&gt;&quot;,
+          &quot;##FORMAT=&lt;ID=GP,Number=G,Type=Float,Description=\&quot;Estimated Genotype Probability\&quot;&gt;&quot;)
+
+# Write to disk ----------------------------------------
+
+options(&quot;scipen&quot;=1000, &quot;digits&quot;=4)
+# for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
+write_lines(header,
+            file = paste0(outPath, outName,&quot;.vcf&quot;))
+write.table(VCFFile,
+            paste0(outPath, outName,&quot;.vcf&quot;),
+            append = TRUE, sep = &quot;\t&quot;, row.names=F, col.names=T, quote=F)
+ 
+system(paste0(&quot;cat &quot;, outPath, outName, &quot;.vcf | bgzip -c &gt; &quot;, outPath, outName, &quot;.vcf.gz&quot;))
+
+## Convert VCF to a Dosage file
+
+DosFile &lt;- VCFFile
+rownames(DosFile) &lt;- DosFile$ID
+DosFile %&lt;&gt;% dplyr::select(-c(1:9)) %&gt;% t %&gt;% as.data.frame
+
+str(DosFile[,1:10])
+
+for(i in colnames(DosFile)[1:10]){
+  DosFile[,i] &lt;-  ifelse(test = DosFile[,i] == &quot;0|0&quot;,
+                         yes = &quot;0&quot;,
+                         no = ifelse(test = DosFile[,i] == &quot;1|1&quot;,
+                                     yes = &quot;2&quot;,
+                                     no = &quot;1&quot;)) %&gt;% 
+    as.numeric
+}
+
+DArTClones &lt;- rownames(DosFile) %&gt;% gsub(pattern = &quot;BGM.&quot;, replacement = &quot;BGM-&quot;) %&gt;% 
+  gsub(pattern = &quot;.TB&quot;, replacement = &quot;-TB&quot;) %&gt;% 
+  gsub(pattern = &quot;.T.Bco&quot;, replacement = &quot;-TBco&quot;) %&gt;% 
+  gsub(pattern = &quot;.TR&quot;, replacement = &quot;-TR&quot;) %&gt;% 
+  gsub(pattern = &quot;.T.Rx&quot;, replacement = &quot;-TRx&quot;) %&gt;% 
+  gsub(pattern = &quot;BR.([0-9])+.DArT.PL([0-9])+_([A-Z])([0-9])+...&quot;, replacement = &quot;&quot;) %&gt;% 
+  gsub(pattern = &quot;BR.SET([0-9])+.18.&quot;, replacement = &quot;&quot;) %&gt;% 
+  gsub(pattern = &quot;X0&quot;, replacement = &quot;0&quot;) %&gt;% 
+  gsub(pattern = &quot;X1&quot;, replacement = &quot;1&quot;) %&gt;% 
+  gsub(pattern = &quot;X201&quot;, replacement = &quot;201&quot;) %&gt;% 
+  gsub(pattern = &quot;X3&quot;, replacement = &quot;3&quot;) %&gt;% 
+  gsub(pattern = &quot;X4&quot;, replacement = &quot;4&quot;) %&gt;% 
+  gsub(pattern = &quot;X5&quot;, replacement = &quot;5&quot;) %&gt;% 
+  gsub(pattern = &quot;X7&quot;, replacement = &quot;7&quot;) %&gt;% 
+  gsub(pattern = &quot;X9&quot;, replacement = &quot;9&quot;)
+
+
+DArTClones &lt;- cbind(as.matrix(rownames(DosFile)), as.matrix(DArTClones))
+dup &lt;- DArTClones[duplicated(DArTClones[,2]),1]
+dup[dup == &quot;TMEB14&quot;] &lt;- &quot;BR.20.DArT.PL23_H01...TMEB14&quot;
+for(i in 1:nrow(DArTClones)){
+DArTClones[i,2] &lt;- base::ifelse(test = any(DArTClones[i,1] == dup),
+                           yes = DArTClones[i,1],
+                           no = DArTClones[i,2])
+}
+rownames(DosFile) &lt;- DArTClones[,2]
+
+### It still needs to correct the names
+saveRDS(as.matrix(DosFile), file = &quot;output/DCas22_DArt_ReadyForGP_Dos.rds&quot;)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.2 (2021-11-01)
+Platform: aarch64-apple-darwin20 (64-bit)
+Running under: macOS Big Sur 11.6.5
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] reactable_0.2.3 here_1.0.1      forcats_0.5.1   stringr_1.4.0  
+ [5] dplyr_1.0.9     purrr_0.3.4     readr_2.1.2     tidyr_1.2.0    
+ [9] tibble_3.1.7    ggplot2_3.3.6   tidyverse_1.3.1
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.8.3      lubridate_1.8.0   assertthat_0.2.1  rprojroot_2.0.3  
+ [5] digest_0.6.29     utf8_1.2.2        plyr_1.8.7        R6_2.5.1         
+ [9] cellranger_1.1.0  backports_1.4.1   reprex_2.0.1      evaluate_0.15    
+[13] highr_0.9         httr_1.4.3        pillar_1.7.0      rlang_1.0.2      
+[17] readxl_1.4.0      rstudioapi_0.13   whisker_0.4       jquerylib_0.1.4  
+[21] rmarkdown_2.14    labeling_0.4.2    htmlwidgets_1.5.4 munsell_0.5.0    
+[25] broom_0.8.0       compiler_4.1.2    httpuv_1.6.5      modelr_0.1.8     
+[29] xfun_0.30         pkgconfig_2.0.3   htmltools_0.5.2   tidyselect_1.1.2 
+[33] workflowr_1.7.0   fansi_1.0.3       crayon_1.5.1      tzdb_0.3.0       
+[37] dbplyr_2.1.1      withr_2.5.0       later_1.3.0       grid_4.1.2       
+[41] jsonlite_1.8.0    gtable_0.3.0      lifecycle_1.0.1   DBI_1.1.2        
+[45] git2r_0.30.1      magrittr_2.0.3    scales_1.2.0      cli_3.3.0        
+[49] stringi_1.7.6     farver_2.1.0      reshape2_1.4.4    fs_1.5.2         
+[53] promises_1.2.0.1  xml2_1.3.3        bslib_0.3.1       ellipsis_0.3.2   
+[57] generics_0.1.2    vctrs_0.4.1       tools_4.1.2       glue_1.6.2       
+[61] hms_1.1.1         fastmap_1.1.0     yaml_2.3.5        colorspace_2.0-3 
+[65] rvest_1.0.2       knitr_1.38        haven_2.5.0       sass_0.4.1       </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -8,4 +8,333 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+### New Imputation for EMBRAPA with DArT Marker only and DArT plus GBS Markers
+
+Diversity Array Technology LTDA joint all the genotyping data from the four Genotyping Orders that EMBRAPA requested during these six or seven years in one huge file.
+
+So let's what we got at the DArT report for EMBRAPA DArT genotyping of 2022
+```{r, eval = F}
+library(genomicMateSelectR)
+dir("data/DArT2022")
+nskipvcf <- 2
+nskipcounts <- 2
+VCF2022 <- read.table(here::here("data", "Report_6902_VCF_Ref_Version6.txt"),
+                      sep = "\t", header = T, skip = nskipvcf, comment.char = "")
+Counts2022 <- read.table(here::here("data", "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
+                         sep = ",", header = T, skip = nskipcounts)
+Counts2022[1:10,1:30]
+VCF2022[1:10,1:30]
+genomicMateSelectR::convertDart2vcf(dartvcfInput = here::here("data", "Report_6902_VCF_Ref_Version6.txt"),
+                                    dartcountsInput = here::here("data", "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
+                                    nskipvcf = 2, nskipcounts = 2,
+                                    outName = "output/DCas22_6902", ncores = 20)
+```
+
+
+### Filtering the DArT markers previously the Beagle imputation
+
+```{r, eval = F}
+library(here); library(tidyverse)
+library(magrittr); library(dplyr)
+
+## Parameters for the Filter function
+inPath <- "output/"
+inName <- "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw"
+outPath <- "output/"
+outName <- "DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered"
+
+FilterLuc <- function(inPath = NULL, inName, outPath = NULL, outName, CRthresh = 0.6){
+    system(paste0("vcftools --gzvcf ", inPath, inName, ".vcf.gz --freq2 --out ", 
+        outPath, inName))
+    system(paste0("vcftools --gzvcf ", inPath, inName, ".vcf.gz --missing-site --out ", 
+        outPath, inName))
+    
+    INFO <- read.table(paste0(outPath, inName, ".frq"), stringsAsFactors = F, 
+        header = F, skip = 1) %>%
+      rename(CHROM = V1, POS = V2, N_ALLELES = V3,
+             N_CHR = V4, FREQ1 = V5, FREQ2 = V6)
+    callrate <- read.table(paste0(outPath, inName, ".lmiss"), stringsAsFactors = F, 
+        header = T) %>% dplyr::select(CHR, POS, N_DATA, F_MISS) %>%
+      mutate(CHROM = CHR,
+             CR = 1 - F_MISS,
+             .keep = "unused")
+    
+    stats2filterOn <- left_join(INFO, callrate)
+    stats2filterOn %<>% dplyr::mutate(FREQ2 = as.numeric(FREQ2)) %>% 
+        dplyr::mutate(MAF = ifelse(FREQ2 > 0.5,
+                                   yes = 1 - FREQ2, no = FREQ2)) %>% 
+      dplyr::select(-FREQ1, -FREQ2)
+    
+    MAFthresh <- (1/max(stats2filterOn$N_DATA, na.rm = T))**2
+    
+    sitesPassingFilters <- stats2filterOn %>%
+      dplyr::filter(MAF >= MAFthresh, CR >= CRthresh) %>%
+      dplyr::select(CHROM, POS)
+    print(paste0(nrow(sitesPassingFilters), " sites passing filter"))
+    write.table(sitesPassingFilters, file = paste0(outPath, inName, 
+        ".sitesPassing"), row.names = F, col.names = F, quote = F)
+    system(paste0("vcftools --gzvcf ", inPath, inName, ".vcf.gz", 
+        " ", "--positions ", outPath, inName, ".sitesPassing", 
+        " ", "--recode --stdout | bgzip -c -@ 24 > ", outPath, 
+        outName, ".vcf.gz"))
+    print(paste0("Filtering Complete: ", outName))
+}
+
+FilterLuc(inPath=inPath, inName=inName,
+          outPath=outPath, outName=outName,
+          CRthresh = 0.6)
+```
+
+##### Download of the Raw Filtered VCF
+
+```{bash, eval = F}
+cd output/DArT2022
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz .
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.lmiss .
+
+scp lbraatz@cbsulm35.biohpc.cornell.edu:/workdir/lbraatz/DCas22_6902/output/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.frq .
+
+cd ../..
+```
+
+##### MAF and Call Rate of the Raw data
+
+```{r}
+library(tidyverse); library(here)
+library(reactable)
+INFO <- read.table(here::here("output", "DArT2022", "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.frq"),
+                   stringsAsFactors = F, 
+                   header = F, skip = 1) %>%
+  rename(CHROM = V1, POS = V2, N_ALLELES = V3,
+         N_CHR = V4, FREQ1 = V5, FREQ2 = V6)
+callrate <- read.table(here::here("output", "DArT2022", "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.lmiss"),
+                       stringsAsFactors = F, 
+                       header = T) %>% dplyr::select(CHR, POS, N_DATA, F_MISS) %>%
+  mutate(CHROM = CHR,
+         CR = 1 - F_MISS,
+         .keep = "unused")
+
+stats2filterOn <- left_join(INFO, callrate)
+
+stats2filterOn %<>% dplyr::mutate(FREQ2 = as.numeric(FREQ2)) %>% 
+  dplyr::mutate(MAF = ifelse(FREQ2 > 0.5,
+                             yes = 1 - FREQ2, no = FREQ2)) %>% 
+  dplyr::select(-FREQ1, -FREQ2)
+MAFthresh <- (1/max(stats2filterOn$N_DATA, na.rm = T))**2
+
+stats2filterOn %<>% filter(!is.na(CHROM), CR >= 0.6, MAF >= MAFthresh) %>% 
+  select(CR, MAF) %>% rename(CallRate = CR) %>% reshape2::melt(.)
+
+stats2filterOn %>% ggplot(aes(x= value)) + 
+  geom_density() + facet_grid(~variable, scales = "free_x") + theme_minimal()
+```
+
+
+### Split the VCF per chromosome
+
+```{r, eval = F}
+require(furrr); plan(multisession, workers = 18)
+options(future.globals.maxSize=+Inf); options(future.rng.onMisuse="ignore")
+  
+vcfIn<-here::here("output/","DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz")
+filters<-"--minDP 4 --maxDP 50" # because using GT not PL for impute (Beagle5)
+outPath<-here::here("output/")
+outSuffix<-"DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered"
+
+future_map(1:18,
+           ~genomicMateSelectR::splitVCFbyChr(Chr=.,
+                                              vcfIn=vcfIn,filters=filters,
+                                              outPath=outPath,
+                                              outSuffix=outSuffix))
+plan(sequential)
+
+```
+
+
+### Imputation DArT markers only
+
+Imputation is performed by chromosome
+```{bash, eval = F}
+java -Xms2g -Xmx [maxmem] -jar /programs/beagle/beagle.jar gt= [targetVCF] map= [mapFile] out= [outName] nthreads= [nthreads] impute= [impute]  ne=  [ne]
+```
+
+```{r, eval = F}
+runBeagle5Luc <- function(targetVCF, mapFile, outName, nthreads, maxmem = "500g", 
+    impute = TRUE, ne = 1e+05, samplesToExclude = NULL){
+  system(paste0("java -Xms2g -Xmx", maxmem, " -jar /programs/beagle/beagle.jar ", 
+                "gt=", targetVCF, " ", "map=", mapFile, " ",
+                "out=", outName, " ", "nthreads=", nthreads, 
+                " impute=", impute, " ne=", ne,
+                ifelse(!is.null(samplesToExclude),
+                       paste0(" excludesamples=", samplesToExclude), "")))}
+
+targetVCFpath<-here::here("output/") # location of the targetVCF
+mapPath<-here::here("data", "CassavaGeneticMapV6updated/")
+outPath<-here::here("output/")
+outSuffix<-"DCas22_6902"
+
+library(tidyverse); library(magrittr); 
+purrr::map(1:18,
+           ~runBeagle5Luc(targetVCF=paste0(targetVCFpath,"chr",.,
+                                           "_DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz"),
+                          mapFile=paste0(mapPath,"chr",.,
+                                         "_cassava_cM_pred.v6_91019.map"),
+                          outName=paste0(outPath,"chr",.,
+                                         "_DCas22_6902_DArT_imputed"),
+                          nthreads=110))
+```
+
+Organize the Beagle logs in a directory
+
+```{bash, eval = F}
+cd ~/Desktop/Genotyping/DArT/EMBRAPA/DCas22_6902/output/
+mkdir BeagleLogs
+cp *_DCas22_6902_DArT_imputed.log BeagleLogs/.
+rm *_DCas22_6902_DArT_imputed.log
+```
+
+### Post Imputation Filter
+Standard post-imputation filter: $CR≥0.6$, $MAF≥(1/7827)^2$.
+
+Loop to filter all 18 VCF files in parallel
+
+```{r, eval = F}
+
+
+
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+
+require(furrr); plan(multisession, workers = 18)
+
+future_map(1:18,
+           ~FilterLuc(inPath=inPath,
+                      inName=paste0("chr",.,"_DCas22_6902_DArT_imputed"),
+                      outPath=outPath,
+                      outName=paste0("chr",.,"_DCas22_6902_DArT_imputedAndFiltered"),
+                      CRthresh = 0.6))
+plan(sequential)
+```
+
+Let's check what we got
+```{r, eval = F}
+purrr::map(1:18,~system(paste0("zcat ",here::here("output/"),"chr",.,"_DCas22_6902_DArT_imputedAndFiltered.vcf.gz | wc -l")))
+```
+
+```
+Chr 1 - 1064
+Chr 2 - 696
+Chr 3 - 682
+Chr 4 - 682
+Chr 5 - 634
+Chr 6 - 656
+Chr 7 - 428
+Chr 8 - 532
+Chr 9 - 520
+Chr 10 - 664
+Chr 11 - 591
+Chr 12 - 468
+Chr 13 - 508
+Chr 14 - 707
+Chr 15 - 516
+Chr 16 - 437
+Chr 17 - 543
+Chr 18 - 480
+```
+
+### Formats for GS and GWAS Analysis
+
+```{r, eval = F}
+for(i in 1:18){
+  system(paste0("gzcat chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf.gz",
+  " > ",
+  "chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf"))
+}
+
+VCFFile <- tibble()
+inPath <- "output/DArT2022/"
+outPath <- "output/DArT2022/"
+outName <- "AllChrom_DArT_ReadyForGP_2022May04"
+
+for(i in 1:18){
+  x <- read.table(file = paste0(inPath, "chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf"),
+                  header = T, comment.char = "", skip = 9, sep = "\t")
+  print(paste0("chr - ", i, " - NSNPs ", nrow(x)))
+  VCFFile <- rbind(VCFFile, x)
+}
+
+VCFFile %<>% rename(`#CHROM` = X.CHROM)
+
+# Header ----------------------------------------
+header<-c("##fileformat=VCFv4.2",
+          "##filedate=20220504",
+          "##source=\"beagle.28Sep18.793.jar\"",
+          "##INFO=<ID=AF,Number=A,Type=Float,Description=\"Estimated ALT Allele Frequencies\">",
+          "##INFO=<ID=DR2,Number=1,Type=Float,Description=\"Dosage R-Squared: estimated squared correlation between estimated REF dose [P(RA) + 2*P(RR)] and true REF dose\">",
+          "##INFO=<ID=IMP,Number=0,Type=Flag,Description=\"Imputed marker\">",
+          "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+          "##FORMAT=<ID=DS,Number=A,Type=Float,Description=\"estimated ALT dose [P(RA) + P(AA)]\">",
+          "##FORMAT=<ID=GP,Number=G,Type=Float,Description=\"Estimated Genotype Probability\">")
+
+# Write to disk ----------------------------------------
+
+options("scipen"=1000, "digits"=4)
+# for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
+write_lines(header,
+            file = paste0(outPath, outName,".vcf"))
+write.table(VCFFile,
+            paste0(outPath, outName,".vcf"),
+            append = TRUE, sep = "\t", row.names=F, col.names=T, quote=F)
+ 
+system(paste0("cat ", outPath, outName, ".vcf | bgzip -c > ", outPath, outName, ".vcf.gz"))
+
+## Convert VCF to a Dosage file
+
+DosFile <- VCFFile
+rownames(DosFile) <- DosFile$ID
+DosFile %<>% dplyr::select(-c(1:9)) %>% t %>% as.data.frame
+
+str(DosFile[,1:10])
+
+for(i in colnames(DosFile)[1:10]){
+  DosFile[,i] <-  ifelse(test = DosFile[,i] == "0|0",
+                         yes = "0",
+                         no = ifelse(test = DosFile[,i] == "1|1",
+                                     yes = "2",
+                                     no = "1")) %>% 
+    as.numeric
+}
+
+DArTClones <- rownames(DosFile) %>% gsub(pattern = "BGM.", replacement = "BGM-") %>% 
+  gsub(pattern = ".TB", replacement = "-TB") %>% 
+  gsub(pattern = ".T.Bco", replacement = "-TBco") %>% 
+  gsub(pattern = ".TR", replacement = "-TR") %>% 
+  gsub(pattern = ".T.Rx", replacement = "-TRx") %>% 
+  gsub(pattern = "BR.([0-9])+.DArT.PL([0-9])+_([A-Z])([0-9])+...", replacement = "") %>% 
+  gsub(pattern = "BR.SET([0-9])+.18.", replacement = "") %>% 
+  gsub(pattern = "X0", replacement = "0") %>% 
+  gsub(pattern = "X1", replacement = "1") %>% 
+  gsub(pattern = "X201", replacement = "201") %>% 
+  gsub(pattern = "X3", replacement = "3") %>% 
+  gsub(pattern = "X4", replacement = "4") %>% 
+  gsub(pattern = "X5", replacement = "5") %>% 
+  gsub(pattern = "X7", replacement = "7") %>% 
+  gsub(pattern = "X9", replacement = "9")
+
+
+DArTClones <- cbind(as.matrix(rownames(DosFile)), as.matrix(DArTClones))
+dup <- DArTClones[duplicated(DArTClones[,2]),1]
+dup[dup == "TMEB14"] <- "BR.20.DArT.PL23_H01...TMEB14"
+for(i in 1:nrow(DArTClones)){
+DArTClones[i,2] <- base::ifelse(test = any(DArTClones[i,1] == dup),
+                           yes = DArTClones[i,1],
+                           no = DArTClones[i,2])
+}
+rownames(DosFile) <- DArTClones[,2]
+
+### It still needs to correct the names
+saveRDS(as.matrix(DosFile), file = "output/DCas22_DArt_ReadyForGP_Dos.rds")
+```
+
