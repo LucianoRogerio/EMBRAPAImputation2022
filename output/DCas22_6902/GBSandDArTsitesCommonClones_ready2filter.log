@@ -1,0 +1,16 @@
+
+VCFtools - 0.1.16
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--gzvcf output/DCas22_6902/GBSandDArTsitesCommonClones_ready2filter.vcf.gz
+	--hardy
+	--out output/DCas22_6902/GBSandDArTsitesCommonClones_ready2filter
+
+Using zlib version: 1.2.11
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+After filtering, kept 873 out of 873 Individuals
+Outputting HWE statistics (but only for biallelic loci)
+After filtering, kept 411320 out of a possible 411320 Sites
+Run Time = 45.00 seconds

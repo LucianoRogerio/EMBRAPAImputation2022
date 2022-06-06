@@ -12,22 +12,50 @@ editor_options:
 
 Diversity Array Technology LTDA joint all the genotyping data from the four Genotyping Orders that EMBRAPA requested during these six or seven years in one huge file.
 
-So let's what we got at the DArT report for EMBRAPA DArT genotyping of 2022
+So let's check what we got at the DArT report for EMBRAPA DArT genotyping of 2022
 ```{r, eval = F}
 library(genomicMateSelectR)
 dir("data/DArT2022")
 nskipvcf <- 2
 nskipcounts <- 2
-VCF2022 <- read.table(here::here("data", "Report_6902_VCF_Ref_Version6.txt"),
-                      sep = "\t", header = T, skip = nskipvcf, comment.char = "")
-Counts2022 <- read.table(here::here("data", "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
-                         sep = ",", header = T, skip = nskipcounts)
-Counts2022[1:10,1:30]
+VCF2022 <- read.table(here::here("data", "DArT2022", "Report_6902_VCF_Ref_Version6.txt"),
+                      sep = "\t", header = T, skip = nskipvcf, comment.char = "",
+                      check.names = F)
+Counts2022 <- read.table(here::here("data", "DArT2022",
+                                    "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
+                         sep = ",", header = T, skip = nskipcounts, check.names = F)
+Counts2022[1:10,1:50]
 VCF2022[1:10,1:30]
-genomicMateSelectR::convertDart2vcf(dartvcfInput = here::here("data", "Report_6902_VCF_Ref_Version6.txt"),
-                                    dartcountsInput = here::here("data", "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
+genomicMateSelectR::convertDart2vcf(dartvcfInput = here::here("data", "DArT2022", "Report_6902_VCF_Ref_Version6.txt"),
+                                    dartcountsInput = here::here("data", "DArT2022", "SEQ_SNPs_counts_0_Target_extend_Ref.csv"),
                                     nskipvcf = 2, nskipcounts = 2,
-                                    outName = "output/DCas22_6902", ncores = 20)
+                                    outName = "output/DCas22_6902", ncores = 1)
+```
+
+Add the VCF header to the DArT VCF file
+```{r Add VCF header, eval = F}
+system(paste0("bgzip -d -@ 7 output/DArT2022/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz > ",
+              "output/DArT2022/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf"))
+
+DArTVCFFileSel <- read.table(file = here::here("output", "DArT2022",
+                                               "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf"),
+                             sep = "\t", header = T, comment.char = "", check.names = F)
+
+header <- c("##fileformat=VCFv4.0",
+            "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+            "##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">",
+            "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth (only filtered reads used for calling)\">",
+            "##FORMAT=<ID=PL,Number=3,Type=Float,Description=\"Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\">")
+
+write_lines(header, file = here::here("output", "DCas22_6902",
+                                      "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf"),
+            append = F)
+write.table(x = DArTVCFFileSel, file = here::here("output", "DCas22_6902",
+                                                  "DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+
+system(paste0("bgzip -c -@ 7 output/DCas22_6902/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf > ",
+              "output/DCas22_6902/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz"))
 ```
 
 
@@ -152,189 +180,60 @@ plan(sequential)
 
 ```
 
+### Check for Duplicates in DArT report and GBS VCF file - [link](Duplicates.html)
 
-### Imputation DArT markers only
+### Imputation DArT markers only - [link](DArTImp.html)
 
-Imputation is performed by chromosome
-```{bash, eval = F}
-java -Xms2g -Xmx [maxmem] -jar /programs/beagle/beagle.jar gt= [targetVCF] map= [mapFile] out= [outName] nthreads= [nthreads] impute= [impute]  ne=  [ne]
-```
+#### Quality control
 
-```{r, eval = F}
-runBeagle5Luc <- function(targetVCF, mapFile, outName, nthreads, maxmem = "500g", 
-    impute = TRUE, ne = 1e+05, samplesToExclude = NULL){
-  system(paste0("java -Xms2g -Xmx", maxmem, " -jar /programs/beagle/beagle.jar ", 
-                "gt=", targetVCF, " ", "map=", mapFile, " ",
-                "out=", outName, " ", "nthreads=", nthreads, 
-                " impute=", impute, " ne=", ne,
-                ifelse(!is.null(samplesToExclude),
-                       paste0(" excludesamples=", samplesToExclude), "")))}
+| Pre |             | Post |             |
+| :-: | :---------: | :--: | :---------: |
+| MAF | $≥(2/7827)$ | MAF  | $≥(2/7827)$ |
+| CR  | $≥0.6$      | HWE  | $P_{HWE}≥10^{-20}$ |
+|     |             |      |             |
 
-targetVCFpath<-here::here("output/") # location of the targetVCF
-mapPath<-here::here("data", "CassavaGeneticMapV6updated/")
-outPath<-here::here("output/")
-outSuffix<-"DCas22_6902"
+#### SNPs Markers
 
-library(tidyverse); library(magrittr); 
-purrr::map(1:18,
-           ~runBeagle5Luc(targetVCF=paste0(targetVCFpath,"chr",.,
-                                           "_DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz"),
-                          mapFile=paste0(mapPath,"chr",.,
-                                         "_cassava_cM_pred.v6_91019.map"),
-                          outName=paste0(outPath,"chr",.,
-                                         "_DCas22_6902_DArT_imputed"),
-                          nthreads=110))
-```
+5,914 SNPs Markers from 7,827 clones
 
-Organize the Beagle logs in a directory
+| Chr   | N˚Mkrs | Chr    | N˚Mkrs | Chr    | N˚Mkrs |
+| :---: | :----: | :----: | :----: | :----: | :----: |
+| Chr 1 | 674    | Chr 7  | 216    | Chr 13 | 261    |
+| Chr 2 | 369    | Chr 8  | 294    | Chr 14 | 380    |
+| Chr 3 | 372    | Chr 9  | 262    | Chr 15 | 297    |
+| Chr 4 | 371    | Chr 10 | 301    | Chr 16 | 219    |
+| Chr 5 | 337    | Chr 11 | 317    | Chr 17 | 305    |
+| Chr 6 | 379    | Chr 12 | 285    | Chr 18 | 275    |
+|       |        |        |        |        |        |
 
-```{bash, eval = F}
-cd ~/Desktop/Genotyping/DArT/EMBRAPA/DCas22_6902/output/
-mkdir BeagleLogs
-cp *_DCas22_6902_DArT_imputed.log BeagleLogs/.
-rm *_DCas22_6902_DArT_imputed.log
-```
+### Imputation GBS + DArT Markers - [link](GBS_DArTImp.html)
 
-### Post Imputation Filter
-Standard post-imputation filter: $CR≥0.6$, $MAF≥(1/7827)^2$.
+#### Quality control
 
-Loop to filter all 18 VCF files in parallel
+| Pre |             | Post |             |
+| :-: | :---------: | :--: | :---------: |
+| MAF | $≥(2/7827)$ | MAF  | $≥(2/7827)$ |
+| CR  | $≥0.6$      | HWE  | $P_{HWE}≥10^{-20}$ |
+| HWE | $P_{HWE}≥10^{-20}$ |      |             |
+|     |             |      |      |
 
-```{r, eval = F}
+#### SNPs Markers
 
+37,877 SNPs Markers from 7,827 clones
 
+| Chr   | N˚Mkrs | Chr    | N˚Mkrs | Chr    | N˚Mkrs |
+| :---: | :----: | :----: | :----: | :----: | :----: |
+| Chr 1 | 3,669  | Chr 7  | 1,256  | Chr 13 | 1,812  |
+| Chr 2 | 2,717  | Chr 8  | 2,015  | Chr 14 | 2,105  |
+| Chr 3 | 2,547  | Chr 9  | 2,117  | Chr 15 | 2,428  |
+| Chr 4 | 1,982  | Chr 10 | 1,519  | Chr 16 | 1,692  |
+| Chr 5 | 2,607  | Chr 11 | 2,109  | Chr 17 | 1,542  |
+| Chr 6 | 2,497  | Chr 12 | 1,733  | Chr 18 | 1,530  |
+|       |        |        |        |        |        |
 
-inPath<-here::here("output/")
-outPath<-here::here("output/")
-
-require(furrr); plan(multisession, workers = 18)
-
-future_map(1:18,
-           ~FilterLuc(inPath=inPath,
-                      inName=paste0("chr",.,"_DCas22_6902_DArT_imputed"),
-                      outPath=outPath,
-                      outName=paste0("chr",.,"_DCas22_6902_DArT_imputedAndFiltered"),
-                      CRthresh = 0.6))
-plan(sequential)
-```
-
-Let's check what we got
-```{r, eval = F}
-purrr::map(1:18,~system(paste0("zcat ",here::here("output/"),"chr",.,"_DCas22_6902_DArT_imputedAndFiltered.vcf.gz | wc -l")))
-```
-
-```
-Chr 1 - 1064
-Chr 2 - 696
-Chr 3 - 682
-Chr 4 - 682
-Chr 5 - 634
-Chr 6 - 656
-Chr 7 - 428
-Chr 8 - 532
-Chr 9 - 520
-Chr 10 - 664
-Chr 11 - 591
-Chr 12 - 468
-Chr 13 - 508
-Chr 14 - 707
-Chr 15 - 516
-Chr 16 - 437
-Chr 17 - 543
-Chr 18 - 480
-```
-
-### Formats for GS and GWAS Analysis
-
-```{r, eval = F}
-for(i in 1:18){
-  system(paste0("gzcat chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf.gz",
-  " > ",
-  "chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf"))
-}
-
-VCFFile <- tibble()
-inPath <- "output/DArT2022/"
-outPath <- "output/DArT2022/"
-outName <- "AllChrom_DArT_ReadyForGP_2022May04"
-
-for(i in 1:18){
-  x <- read.table(file = paste0(inPath, "chr", i, "_DCas22_6902_DArT_imputedAndFiltered.vcf"),
-                  header = T, comment.char = "", skip = 9, sep = "\t")
-  print(paste0("chr - ", i, " - NSNPs ", nrow(x)))
-  VCFFile <- rbind(VCFFile, x)
-}
-
-VCFFile %<>% rename(`#CHROM` = X.CHROM)
-
-# Header ----------------------------------------
-header<-c("##fileformat=VCFv4.2",
-          "##filedate=20220504",
-          "##source=\"beagle.28Sep18.793.jar\"",
-          "##INFO=<ID=AF,Number=A,Type=Float,Description=\"Estimated ALT Allele Frequencies\">",
-          "##INFO=<ID=DR2,Number=1,Type=Float,Description=\"Dosage R-Squared: estimated squared correlation between estimated REF dose [P(RA) + 2*P(RR)] and true REF dose\">",
-          "##INFO=<ID=IMP,Number=0,Type=Flag,Description=\"Imputed marker\">",
-          "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
-          "##FORMAT=<ID=DS,Number=A,Type=Float,Description=\"estimated ALT dose [P(RA) + P(AA)]\">",
-          "##FORMAT=<ID=GP,Number=G,Type=Float,Description=\"Estimated Genotype Probability\">")
-
-# Write to disk ----------------------------------------
-
-options("scipen"=1000, "digits"=4)
-# for a few SNPs, position kept printing in sci notation e.g. 1e3, screws up Beagle etc., this avoids that (I hope)
-write_lines(header,
-            file = paste0(outPath, outName,".vcf"))
-write.table(VCFFile,
-            paste0(outPath, outName,".vcf"),
-            append = TRUE, sep = "\t", row.names=F, col.names=T, quote=F)
- 
-system(paste0("cat ", outPath, outName, ".vcf | bgzip -c > ", outPath, outName, ".vcf.gz"))
-
-## Convert VCF to a Dosage file
-
-DosFile <- VCFFile
-rownames(DosFile) <- DosFile$ID
-DosFile %<>% dplyr::select(-c(1:9)) %>% t %>% as.data.frame
-
-str(DosFile[,1:10])
-
-for(i in colnames(DosFile)[1:10]){
-  DosFile[,i] <-  ifelse(test = DosFile[,i] == "0|0",
-                         yes = "0",
-                         no = ifelse(test = DosFile[,i] == "1|1",
-                                     yes = "2",
-                                     no = "1")) %>% 
-    as.numeric
-}
-
-DArTClones <- rownames(DosFile) %>% gsub(pattern = "BGM.", replacement = "BGM-") %>% 
-  gsub(pattern = ".TB", replacement = "-TB") %>% 
-  gsub(pattern = ".T.Bco", replacement = "-TBco") %>% 
-  gsub(pattern = ".TR", replacement = "-TR") %>% 
-  gsub(pattern = ".T.Rx", replacement = "-TRx") %>% 
-  gsub(pattern = "BR.([0-9])+.DArT.PL([0-9])+_([A-Z])([0-9])+...", replacement = "") %>% 
-  gsub(pattern = "BR.SET([0-9])+.18.", replacement = "") %>% 
-  gsub(pattern = "X0", replacement = "0") %>% 
-  gsub(pattern = "X1", replacement = "1") %>% 
-  gsub(pattern = "X201", replacement = "201") %>% 
-  gsub(pattern = "X3", replacement = "3") %>% 
-  gsub(pattern = "X4", replacement = "4") %>% 
-  gsub(pattern = "X5", replacement = "5") %>% 
-  gsub(pattern = "X7", replacement = "7") %>% 
-  gsub(pattern = "X9", replacement = "9")
+## Results of the Imputations - [link](CheckImp.html)
 
 
-DArTClones <- cbind(as.matrix(rownames(DosFile)), as.matrix(DArTClones))
-dup <- DArTClones[duplicated(DArTClones[,2]),1]
-dup[dup == "TMEB14"] <- "BR.20.DArT.PL23_H01...TMEB14"
-for(i in 1:nrow(DArTClones)){
-DArTClones[i,2] <- base::ifelse(test = any(DArTClones[i,1] == dup),
-                           yes = DArTClones[i,1],
-                           no = DArTClones[i,2])
-}
-rownames(DosFile) <- DArTClones[,2]
+## Genomic Prediction Analysis for Yield traits
 
-### It still needs to correct the names
-saveRDS(as.matrix(DosFile), file = "output/DCas22_DArt_ReadyForGP_Dos.rds")
-```
-
+### Genotypic data preparation - [link](PrepareGenData.html)

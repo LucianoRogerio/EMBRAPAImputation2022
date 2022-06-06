@@ -5,6 +5,20 @@ navbar:
   left:
   - text: Home
     href: index.html
+  - text: Imputations
+    menu:
+    - text: 'Check Duplicates'
+      href: Duplicates.html
+    - text: 'DArT Imputation'
+      href: DArTImp.html
+    - text: 'GBS + DArT Imputation'
+      href: GBS_DArTImp.html
+    - text: 'Imputation Results'
+      href: CheckImp.html
+  - text: 'Genomic Prediction'
+    menu:
+    - text: GenData
+      href: PrepareGenData.html
   - text: About
     href: about.html
   - text: License

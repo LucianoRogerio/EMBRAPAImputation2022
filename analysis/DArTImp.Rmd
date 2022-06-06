@@ -1,0 +1,257 @@
+---
+title: "DArT Markers Imputation"
+author: "LucianoRogerio"
+date: "2022-05-09"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+### Imputation of the DArT Markers only
+
+Imputation is performed by chromosome
+```{bash Imputation Code, eval = F}
+java -Xms2g -Xmx [maxmem] -jar /programs/beagle/beagle.jar gt= [targetVCF] map= [mapFile] out= [outName] nthreads= [nthreads] impute= [impute]  ne=  [ne]
+```
+
+```{r Imputation, eval = F}
+runBeagle5Luc <- function(targetVCF, mapFile, outName, nthreads, maxmem = "500g", 
+    impute = TRUE, ne = 1e+05, samplesToExclude = NULL){
+  system(paste0("java -Xms2g -Xmx", maxmem, " -jar /programs/beagle/beagle.jar ", 
+                "gt=", targetVCF, " ", "map=", mapFile, " ",
+                "out=", outName, " ", "nthreads=", nthreads, 
+                " impute=", impute, " ne=", ne,
+                ifelse(!is.null(samplesToExclude),
+                       paste0(" excludesamples=", samplesToExclude), "")))}
+
+targetVCFpath<-here::here("output/") # location of the targetVCF
+mapPath<-here::here("data", "CassavaGeneticMapV6updated/")
+outPath<-here::here("output/")
+outSuffix<-"DCas22_6902"
+
+library(tidyverse); library(magrittr); 
+purrr::map(1:18,
+           ~runBeagle5Luc(targetVCF=paste0(targetVCFpath,"chr",.,
+                                           "_DCas22_6902_DArTseqLD_AllSites_AllChrom_rawFiltered.vcf.gz"),
+                          mapFile=paste0(mapPath,"chr",.,
+                                         "_cassava_cM_pred.v6_91019.map"),
+                          outName=paste0(outPath,"chr",.,
+                                         "_DCas22_6902_DArT_imputed"),
+                          nthreads=110))
+```
+
+Organize the Beagle logs in a directory
+
+```{bash Folder Organization, eval = F}
+cd ~/Desktop/Genotyping/DArT/EMBRAPA/DCas22_6902/output/
+mkdir BeagleLogs
+cp *_DCas22_6902_DArT_imputed.log BeagleLogs/.
+rm *_DCas22_6902_DArT_imputed.log
+```
+
+### Post Imputation Filter
+Standard post-imputation filter: $CR≥0.6$, $MAF≥(1/7827)^2$.
+
+Loop to filter all 18 VCF files in parallel
+
+```{r Filtering, eval = F}
+
+
+
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+
+require(furrr); plan(multisession, workers = 18)
+
+future_map(1:18,
+           ~FilterLuc(inPath=inPath,
+                      inName=paste0("chr",.,"_DCas22_6902_DArT_imputed"),
+                      outPath=outPath,
+                      outName=paste0("chr",.,"_DCas22_6902_DArT_imputedAndFiltered"),
+                      CRthresh = 0.6))
+plan(sequential)
+```
+
+Let's check what we got
+```{r Check Number SNP, eval = F}
+purrr::map(1:18,~system(paste0("zcat ",here::here("output/"),"chr",.,"_DCas22_6902_DArT_imputedAndFiltered.vcf.gz | wc -l")))
+```
+
+```
+Chr 1 - 1064
+Chr 2 - 696
+Chr 3 - 682
+Chr 4 - 682
+Chr 5 - 634
+Chr 6 - 656
+Chr 7 - 428
+Chr 8 - 532
+Chr 9 - 520
+Chr 10 - 664
+Chr 11 - 591
+Chr 12 - 468
+Chr 13 - 508
+Chr 14 - 707
+Chr 15 - 516
+Chr 16 - 437
+Chr 17 - 543
+Chr 18 - 480
+```
+
+### Formats for GS and GWAS Analysis
+
+```{r Formating the VCF File, eval = F}
+library(tidyverse); library(magrittr)
+### Joint all the 18 Chromosome VCF to one unique file
+inPath <- here::here("output/")
+future_map(1:18,~system(paste0("tabix -f -p vcf ",inPath,
+                               "chr",.,"_DCas22_6902_DArT_imputedAndFiltered.vcf.gz")))
+
+system(paste0("bcftools concat ",
+              "--output ",
+              "AllChrom_DArT_ReadyForGP_2022May05.vcf.gz ",
+              "--output-type z --threads 7 ",
+              paste0("chr",1:18,
+                     "_DCas22_6902_DArT_imputedAndFiltered.vcf.gz",
+                     collapse = " ")))
+
+### Post Imputation Filter function
+postImputeFilterLuc <- function(inPath=NULL,inName,outPath=NULL,outName,HWEthresh=1e-20){
+  require(magrittr); require(dplyr)
+  # Extract imputation quality scores (DR2 and AF) from VCF
+  system(paste0("vcftools --gzvcf ",inPath,inName,".vcf.gz --hardy --out ",outPath,inName))
+
+  # Read scores into R
+  hwe<-read.table(paste0(outPath,inName,".hwe"),
+                  stringsAsFactors = F, header = T)
+  stats2filterOn<-hwe %>% rename(CHROM=CHR)
+  # Compute MAF from AF and make sure numeric
+  # Identify sites passing filter
+  sitesPassingFilters<-stats2filterOn %>%
+    dplyr::filter(P_HWE>HWEthresh) %>%
+    dplyr::select(CHROM,POS)
+  print(paste0(nrow(sitesPassingFilters)," sites passing filter"))
+
+  # Write a list of positions passing filter to disk
+  write.table(sitesPassingFilters,
+              file = paste0(outPath,inName,".sitesPassing"),
+              row.names = F, col.names = F, quote = F)
+  # Apply filter to vcf file with vcftools
+  system(paste0("vcftools --gzvcf ",inPath,inName,".vcf.gz"," ",
+                "--positions ",outPath,inName,".sitesPassing"," ",
+                "--recode --stdout | bgzip -c -@ 24 > ",
+                outPath,outName,".vcf.gz"))
+  print(paste0("Filtering Complete: ",outName))
+}
+
+
+inPath<-here::here("")
+outPath<-here::here("")
+ncores <- 7
+nclones <- 7827
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+postImputeFilterLuc(inPath=inPath,
+                                     inName=paste0("AllChrom_DArT_ReadyForGP_2022May05"),
+                                     outPath=outPath,
+                                     outName=paste0("AllChrom_DArT_ReadyForGP_2022May30"))
+
+system(paste0("vcftools --gzvcf output/AllChrom_DArT_ReadyForGP_2022May30.vcf.gz --maf 0.00025",
+              " --recode --stdout | bgzip -c -@ 7 > output/AllChrom_DArT_ReadyForGPFil_2022May30.vcf.gz"))
+```
+
+```{r Convert VCF to Dosage matrix, eval = F}
+dgenomicMateSelectR::convertVCFtoDosage(pathIn = "output/", pathOut = "output/",
+                                       vcfName = "AllChrom_DArT_ReadyForGPFil_2022May30")
+
+snps <- read.table(file = here::here("output", "AllChrom_DArT_ReadyForGPFil_2022May30.raw"),
+                   stringsAsFactor=F, header = T) %>%
+                     dplyr::select(-FID,-PAT,-MAT,-SEX,-PHENOTYPE) %>%
+                     column_to_rownames(var = "IID") %>%
+                     as.matrix()
+saveRDS(snps,file = here::here("output", "DCas22_DArT_ReadyForGP_Dos.rds"))
+```
+
+### Markers Density
+```{r Markers Density, eval = F}
+library(tidyverse); library(CMplot)
+snps <- readRDS(file = here::here("output", "DArT2022", "DCas22_DArt_ReadyForGP_Dos.rds"))
+
+CMsnps <- tibble(SNP = colnames(snps),
+                 chr = substring(SNP,1,3),
+                 pos = substring(SNP,4)) %>%
+  mutate(chr = gsub(pattern = "_", replacement = "", x = chr) %>%
+           gsub(pattern = "S", replacement = "") %>% as.integer,
+         pos = gsub(pattern = "_[A-Z]", replacement = "", x = pos) %>%
+           gsub(pattern = "_", replacement = "", x = .) %>% as.integer)
+CMplot(CMsnps, plot.type = "d", bin.size = 1e6, col = c("darkgreen", "yellow", "red"),
+       file = "jpg", memo = "DArTDensityMkrs", dpi = 500, file.output = T, verbose = TRUE)
+```
+
+### Fig 1. Density Markers for DArT genotyping
+![](../output/Figures/SNP-Density.Col1_DArTDensityMkrs.Col0_DArTDensityMkrs.jpg)
+
+### Principal Components Analysis
+
+```{r Principal Component Analysis, echo = F, message = F, warning = F}
+library(tidyverse); library(data.table); library(magrittr)
+#DosFile <- readRDS(file = here::here("output", "DArT2022", "DCas22_DArt_ReadyForGP_Dos.rds"))
+
+#DArTPCA <- prcomp(as.matrix(DosFile))
+#saveRDS(object = DArTPCA, file = here::here("output", "DArTPCA.rds"))
+DArTPCA <- readRDS(file = here::here("output", "DArTPCA.rds"))
+
+LabelsPCA <- tibble(Clone = rownames(DArTPCA$x))
+
+LabelsPCA %<>% mutate(Pop = ifelse(Clone %like% "BR.19",
+                                   yes = "C2",
+                                   no = ifelse(Clone %like% "BR.21GS.C3",
+                                               yes = "C3",
+                                               no = ifelse(Clone %like% "BR.18GS",
+                                                           yes = "C1",
+                                                           no = "C0"))))
+DArTPCA$x %>% as.data.frame() %>% mutate(Clone = rownames(.)) %>%
+  dplyr::left_join(LabelsPCA, by = c("Clone")) %>% 
+  ggplot(aes(x = PC1, y = PC2, color = Pop)) + geom_point(size = 0.4)
+
+G1 <- DArTPCA$x %>% as.data.frame() %>% mutate(Clone = rownames(.)) %>%
+  dplyr::left_join(LabelsPCA, by = c("Clone")) %>% 
+  ggplot(aes(x = PC1, y = PC2, color = Pop)) + geom_point(size = 0.4)
+
+LoadChr1 <- DArTPCA$rotation %>% .[rownames(.) %like% "S1_", 1:5] %>% 
+  as.data.frame %>% dplyr::mutate(SNP = rownames(.)) %>% as_tibble %>% 
+  dplyr::select(SNP, everything())
+
+LoadChr1 <- LoadChr1 %>%
+  mutate(Pos = SNP %>% strsplit(split = "_") %>% unlist %>%
+           matrix(ncol = 3, byrow = T) %>% .[,2] %>% as.integer) %>% 
+  dplyr::select(SNP, Pos, PC1, PC2) %>%
+  reshape2::melt(value.name = "Loading",
+                 variable.name = "PC",
+                 id.vars = c("SNP", "Pos"))
+
+G2 <- LoadChr1 %>% ggplot(aes(x = Pos/10**6, y = Loading, fill = PC)) + geom_point(color= "red") +
+  theme_bw() + xlab("Pos (Mb)") + facet_wrap(~PC) + theme(legend.position = "none")
+
+tiff(filename = here::here("output", "Figures", "PCADArT.tiff"), res = 300,
+     units = "cm", compression = "lzw", width = 20, height = 14)
+G1 + annotation_custom(ggplotGrob(G2), xmin = 10, xmax = 23, ymin = 10, ymax = 22)
+dev.off()
+
+
+LoadPC1 <- DArTPCA$rotation %>% as.data.frame %>% mutate(SNP = rownames(.)) %>%
+  as_tibble %>% dplyr::select(SNP, PC1) %>%
+  mutate(Chr = str_sub(SNP, start = 0, end = 3) %>% 
+           gsub(pattern = "_", replacement = "") %>% 
+           gsub(pattern = "S", replacement = "") %>% as.integer,
+         Pos = SNP %>% strsplit(split = "_") %>% unlist %>%
+           matrix(ncol = 3, byrow = T) %>% .[,2] %>% as.integer) %>% 
+  dplyr::select(Chr, Pos, everything())
+
+tiff(filename = here::here("output", "Figures", "LoadingsPCADArT.tiff"), res = 300,
+     units = "cm", compression = "lzw", width = 20, height = 14)
+LoadPC1 %>% ggplot(aes(x = Pos/10**6, y = PC1)) + geom_point(color= "red") +
+  theme_bw() + xlab("Pos (Mb)") + facet_wrap(~Chr, nrow = 1, scales = "free_x") +
+  theme(legend.position = "none") + ggtitle("DArT PCA Loadings") +
+  geom_hline(yintercept = 0, color = "darkred")
+dev.off()
+```

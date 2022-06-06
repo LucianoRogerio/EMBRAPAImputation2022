@@ -1,0 +1,262 @@
+---
+title: "Duplicates"
+author: "LucianoRogerio"
+date: "2022-05-16"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Duplicates in GBS
+
+```{r preparing files for Discordance Index GBS, eval = FALSE}
+source(paste0("vcftools --gzvcf data/GBS/tassel_embrapa_newfastq.bial.recode.vcf.gz ",
+       "--keep data/GBS/GBSDuplicates", 1:3, ".txt --recode --stdout > ",
+       "output/Duplicates/GBSDuplicatesFile", 1:3, ".vcf"))
+
+GBSDup1 <- read.table(file = here::here("output", "Duplicates", "GBSDuplicatesFile1.vcf"),
+                      skip = 31, header = T, comment.char = "", check.names = F)
+GBSDup2 <- read.table(file = here::here("output", "Duplicates", "GBSDuplicatesFile2.vcf"),
+                      skip = 31, header = T, comment.char = "", check.names = F)
+GBSDup3 <- read.table(file = here::here("output", "Duplicates", "GBSDuplicatesFile3.vcf"),
+                      skip = 31, header = T, comment.char = "", check.names = F)
+
+GBSClones <- read.table(file = here::here("data", "GBS", "EM_matched_accessions-GBS.csv"),
+                        sep = ",", header = T)
+
+colnames(GBSDup1)[10:ncol(GBSDup1)] <- GBSClones$uniquename_in_db[match(colnames(GBSDup1)[10:ncol(GBSDup1)], GBSClones$x)]
+colnames(GBSDup2)[10:ncol(GBSDup2)] <- GBSClones$uniquename_in_db[match(colnames(GBSDup2)[10:ncol(GBSDup2)], GBSClones$x)]
+colnames(GBSDup3)[10:ncol(GBSDup3)] <- GBSClones$uniquename_in_db[match(colnames(GBSDup3)[10:ncol(GBSDup3)], GBSClones$x)]
+
+header <- c("##fileformat=VCFv4.0",
+            "##FILTER=<ID=PASS,Description=\"All filters passed\">",
+            "##Tassel=<ID=GenotypeTable,Version=5,Description=\"Reference allele is not known. The major allele was used as reference allele\">",
+            "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+            "##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">",
+            "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth (only filtered reads used for calling)\">",
+            "##FORMAT=<ID=GQ,Number=1,Type=Float,Description=\"Genotype Quality\">",
+            "##FORMAT=<ID=PL,Number=.,Type=Float,Description=\"Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\">",
+            "##INFO=<ID=NS,Number=1,Type=Integer,Description=\"Number of Samples With Data\">",
+            "##INFO=<ID=DP,Number=1,Type=Integer,Description=\"Total Depth\">",
+            "##INFO=<ID=AF,Number=.,Type=Float,Description=\"Allele Frequency\">",
+            "##contig=<ID=1>",
+            "##contig=<ID=2>",
+            "##contig=<ID=3>",
+            "##contig=<ID=4>",
+            "##contig=<ID=5>",
+            "##contig=<ID=6>",
+            "##contig=<ID=7>",
+            "##contig=<ID=8>",
+            "##contig=<ID=9>",
+            "##contig=<ID=10>",
+            "##contig=<ID=11>",
+            "##contig=<ID=12>",
+            "##contig=<ID=13>",
+            "##contig=<ID=14>",
+            "##contig=<ID=15>",
+            "##contig=<ID=16>",
+            "##contig=<ID=17>",
+            "##contig=<ID=18>",
+            "##bcftools_concatVersion=1.14+htslib-1.14",
+            "##bcftools_concatCommand=concat --output tassel_embrapa_newfastq.bial.recode.vcf")
+
+write_lines(header, file = here::here("output", "Duplicates", "GBSDuplicatesFile1renamed.vcf"),
+            append = F)
+write_lines(header, file = here::here("output", "Duplicates", "GBSDuplicatesFile2renamed.vcf"),
+            append = F)
+write_lines(header, file = here::here("output", "Duplicates", "GBSDuplicatesFile3renamed.vcf"),
+            append = F)
+write.table(x = GBSDup1, file = here::here("output", "Duplicates", "GBSDuplicatesFile1renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+write.table(x = GBSDup2, file = here::here("output", "Duplicates", "GBSDuplicatesFile2renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+write.table(x = GBSDup3, file = here::here("output", "Duplicates", "GBSDuplicatesFile3renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+```
+
+```{bash Compacting GBS VCF files, eval = FALSE}
+bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile1renamed.vcf > output/Duplicates/GBSDuplicatesFile1renamed.vcf.gz
+
+bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile2renamed.vcf > output/Duplicates/GBSDuplicatesFile2renamed.vcf.gz
+
+bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile3renamed.vcf > output/Duplicates/GBSDuplicatesFile3renamed.vcf.gz
+```
+
+### Comparing the Duplicates
+
+```{bash Comparing the GBS Duplicates, eval = F}
+vcftools --gzvcf output/Duplicates/GBSDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile2renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup1_2 &
+
+vcftools --gzvcf output/Duplicates/GBSDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup1_3 &
+
+vcftools --gzvcf output/Duplicates/GBSDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup2_3 &
+```
+
+### Joint the results
+
+```{r Joint the results GBS}
+library(tidyverse)
+GBSDup1_3 <- read.table(file = here::here("output", "Duplicates", "GBSDup1_2.diff.indv"),
+                        sep = "\t", header = T, check.names = F) %>%
+  mutate(COMP1 = 1,
+         COMP2 = 2) %>% 
+  rbind(read.table(file = here::here("output", "Duplicates", "GBSDup1_3.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>%
+          mutate(COMP1 = 1,
+                 COMP2 = 3)) %>%
+  rbind(read.table(file = here::here("output", "Duplicates", "GBSDup2_3.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>% 
+          mutate(COMP1 = 2,
+                 COMP2 = 3)) %>%
+  filter(!is.na(DISCORDANCE)) %>%
+  mutate(N_NA = 400122 - N_COMMON_CALLED) %>%
+  select(INDV, COMP1, COMP2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE) %>% arrange(INDV, COMP1, COMP2)
+
+AllGBSDup <- read.table(file = here::here("data", "GBS", "AllGBSDuplicates.txt"),
+                        header = T, sep = "\t")
+
+GBSDup1_3 %<>% left_join(AllGBSDup, by = c("INDV" = "uniquename_in_db", "COMP1" = "FILE")) %>% 
+  rename(INDV1 = x) %>% left_join(AllGBSDup, by = c("INDV" = "uniquename_in_db", "COMP2" = "FILE")) %>% 
+  rename(INDV2 = x) %>% select(INDV, INDV1, INDV2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE)
+
+write.table(GBSDup1_3, file = here::here("data", "GBS", "GBSDupDiscordanceIndex.csv"),
+            quote = F, sep = ",", dec = ".", row.names = F)
+```
+
+### Table 1. Discordance index from *vcftools* software for all the duplicates in GBS genotyping platform.
+```{r table1, echo = FALSE}
+library(reactable)
+GBSDup1_3 %>% reactable(columns = list(DISCORDANCE = colDef(format = colFormat(digits = 4, locales = "en-US"))))
+```
+
+
+
+## Duplicates in DArT
+
+```{r  preparing files for Discordance Index DArT, eval = FALSE}
+source(paste0("vcftools --gzvcf output/DArT2022/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz ",
+       "--keep data/DArTDuplicates", 1:4, ".txt --recode --stdout > ",
+       "output/Duplicates/DArTDuplicatesFile", 1:4, ".vcf"))
+
+DArTDup1 <- read.table(file = here::here("output", "Duplicates", "DArTDuplicatesFile1.vcf"),
+                       header = T, comment.char = "", check.names = F)
+DArTDup2 <- read.table(file = here::here("output", "Duplicates", "DArTDuplicatesFile2.vcf"),
+                       header = T, comment.char = "", check.names = F)
+DArTDup3 <- read.table(file = here::here("output", "Duplicates", "DArTDuplicatesFile3.vcf"),
+                       header = T, comment.char = "", check.names = F)
+DArTDup4 <- read.table(file = here::here("output", "Duplicates", "DArTDuplicatesFile4.vcf"),
+                       header = T, comment.char = "", check.names = F)
+
+DArTClones <- read.table(file = here::here("data", "DArTGPInfo2.csv"),
+                         sep = ",", header = T)
+
+colnames(DArTDup1)[10:ncol(DArTDup1)] <- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup1)[10:ncol(DArTDup1)], DArTClones$DarTMatch)]
+colnames(DArTDup2)[10:ncol(DArTDup2)] <- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup2)[10:ncol(DArTDup2)], DArTClones$DarTMatch)]
+colnames(DArTDup3)[10:ncol(DArTDup3)] <- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup3)[10:ncol(DArTDup3)], DArTClones$DarTMatch)]
+colnames(DArTDup4)[10:ncol(DArTDup4)] <- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup4)[10:ncol(DArTDup4)], DArTClones$DarTMatch)]
+
+header <- c("##fileformat=VCFv4.0",
+            "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
+            "##FORMAT=<ID=AD,Number=.,Type=Integer,Description=\"Allelic depths for the reference and alternate alleles in the order listed\">",
+            "##FORMAT=<ID=DP,Number=1,Type=Integer,Description=\"Read Depth (only filtered reads used for calling)\">",
+            "##FORMAT=<ID=PL,Number=3,Type=Float,Description=\"Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\">")
+
+write_lines(header, file = here::here("output", "Duplicates", "DArTDuplicatesFile1renamed.vcf"),
+            append = F)
+write_lines(header, file = here::here("output", "Duplicates", "DArTDuplicatesFile2renamed.vcf"),
+            append = F)
+write_lines(header, file = here::here("output", "Duplicates", "DArTDuplicatesFile3renamed.vcf"),
+            append = F)
+write_lines(header, file = here::here("output", "Duplicates", "DArTDuplicatesFile4renamed.vcf"),
+            append = F)
+write.table(x = DArTDup1, file = here::here("output", "Duplicates", "DArTDuplicatesFile1renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+write.table(x = DArTDup2, file = here::here("output", "Duplicates", "DArTDuplicatesFile2renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+write.table(x = DArTDup3, file = here::here("output", "Duplicates", "DArTDuplicatesFile3renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+write.table(x = DArTDup4, file = here::here("output", "Duplicates", "DArTDuplicatesFile4renamed.vcf"),
+            quote = F, row.names = F, append = T, col.names = T, sep = "\t")
+```
+
+```{r Compacting DArT VCF files, eval = FALSE}
+source(paste0("bgzip -c -@ 6 output/Duplicates/DArTDuplicatesFile", 1:4, "renamed.vcf > output/Duplicates/DArTDuplicatesFile", 1:4, "renamed.vcf.gz"))
+```
+
+### Comparing the Duplicates
+
+```{bash Comparing the Duplicates DArT, eval = F}
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile2renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_2
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_3
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_4
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup2_3
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup2_4
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile3renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup3_4
+```
+
+### Joint the results
+
+```{r Joint the results DArT}
+DArTDup1_4 <- read.table(file = here::here("output", "Duplicates", "DArTDup1_2.diff.indv"),
+                        sep = "\t", header = T, check.names = F) %>%
+  mutate(COMP1 = 1,
+         COMP2 = 2) %>% 
+  rbind(read.table(file = here::here("output", "Duplicates", "DArTDup1_3.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>%
+          mutate(COMP1 = 1,
+                 COMP2 = 3)) %>%
+    rbind(read.table(file = here::here("output", "Duplicates", "DArTDup1_4.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>%
+          mutate(COMP1 = 1,
+                 COMP2 = 4)) %>%
+  rbind(read.table(file = here::here("output", "Duplicates", "DArTDup2_3.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>% 
+          mutate(COMP1 = 2,
+                 COMP2 = 3)) %>%
+    rbind(read.table(file = here::here("output", "Duplicates", "DArTDup2_4.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>% 
+          mutate(COMP1 = 2,
+                 COMP2 = 4)) %>%
+      rbind(read.table(file = here::here("output", "Duplicates", "DArTDup3_4.diff.indv"),
+                   sep = "\t", header = T, check.names = F) %>% 
+          mutate(COMP1 = 3,
+                 COMP2 = 4)) %>%
+  filter(!is.na(DISCORDANCE)) %>%
+  mutate(N_NA = 12981 - N_COMMON_CALLED) %>%
+  select(INDV, COMP1, COMP2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE) %>% arrange(INDV, COMP1, COMP2)
+
+AllDArTDup <- read.table(file = here::here("data", "AllDArTDuplicates.txt"),
+                        header = T, sep = "\t")
+
+DArTDup1_4 %<>% left_join(AllDArTDup, by = c("INDV" = "Observation_unit_name", "COMP1" = "FILE")) %>% 
+  rename(INDV1 = DarTMatch) %>% left_join(AllDArTDup, by = c("INDV" = "Observation_unit_name", "COMP2" = "FILE")) %>% 
+  rename(INDV2 = DarTMatch) %>% select(INDV, INDV1, INDV2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE)
+
+write.table(DArTDup1_4, file = here::here("data", "DArTDupDiscordanceIndex.csv"),
+            quote = F, sep = ",", dec = ".", row.names = F)
+```
+
+### Table 2. Discordance index from *vcftools* software for all the duplicates in DArT genotyping platform.
+```{r table2, echo = FALSE}
+library(reactable)
+DArTDup1_4 %>% reactable(columns = list(DISCORDANCE = colDef(format = colFormat(digits = 4, locales = "en-US"))))
+```
+

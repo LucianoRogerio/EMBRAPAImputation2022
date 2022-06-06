@@ -1,0 +1,52 @@
+---
+title: "PreparePhenData"
+author: "LucianoRogerio"
+date: "2022-06-07"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{r, eval = F}
+library(tidyverse); library(magrittr)
+load(here::here("output", "TP_GetBLUPs.RData"))
+
+### Change the phenos data
+fixedformula <- c("Value ~ yearInLoc")
+randformula <- c("~idv(GID) + idv(trialInLocYr) + at(CompleteBlocks,'Yes'):repInTrial + at(IncompleteBlocks,'Yes'):blockInRep")
+
+phenos %<>%  mutate(fixedFormula = fixedformula,
+                    randFormula = randformula)
+phenos$rcovFormula <- NULL
+
+for(i in 1:nrow(phenos)){
+phenos$METdata[[i]] %<>% rename(GID = germplasmName)
+
+phenos$METdata[[i]] %<>% mutate(CompleteBlocks = ifelse(CompleteBlocks == TRUE, "Yes", "No"),
+                                IncompleteBlocks = ifelse(IncompleteBlocks == TRUE, "Yes", "No"))
+}
+
+phenos <- rbind(phenos, phenos[c(1,4,5),])
+
+for(i in 6:nrow(phenos)){
+phenos$randFormula[[i]] <- c("~idv(GID) + idv(trialInLocYr)")
+}
+save(phenos, file = here::here("output", "TP_GetBLUPs_asreml.RData"))
+```
+
+```{r, eval = F}
+library(asreml); library(furrr); library(tidyverse)
+load("data/TP_GetBLUPs_asreml.RData")
+source("code/get_blups_asreml.r")
+require(furrr)
+options(future.globals.maxSize=+Inf); options(future.rng.onMisuse="ignore")
+blups <- phenos %>%
+  mutate(fitAS=future_pmap(.,fitASfunc))
+saveRDS(blups,file=here::here("output","DRGBlupsGS.rds"))
+rm(test); gc()
+```
+
+
+

@@ -1,0 +1,15 @@
+PLINK v1.90b6.25 64-bit (5 Mar 2022)
+Options in effect:
+  --const-fid
+  --gzvcf output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf.gz
+  --make-bed
+  --out output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf.gz
+
+Hostname: AG-GDEV-1QXQ05P
+Working directory: /Users/lbd54/Documents/GitHub/EMBRAPAImputation2022
+Start time: Fri May 20 14:16:38 2022
+
+Error: Unrecognized flag ('--gzvcf').
+For more information, try "plink --help <flag name>" or "plink --help | more".
+
+End time: Fri May 20 14:16:38 2022

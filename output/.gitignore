@@ -1,2 +1,10 @@
-DCas22_DArt_ReadyForGP_Dos.rds
-DArT2022
+AllChrDCas22_6902_StudyPopimputed.vcf.gz
+AllClonesGBSandDArTImputedAndFiltered.raw
+AllClonesGBSandDArTImputedAndFiltered.vcf.gz
+DArTPCA.rds
+DCas22_6902RefPopImputed.vcf.gz
+GAddmatrixDArTGS.rds
+GAddmatrixGBSandDArTGS.rds
+GBSDArTPCA.rds
+GDommatrixDArTGS.rds
+GDommatrixGBSandDArTGS.rds

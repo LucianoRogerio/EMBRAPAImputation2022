@@ -1,0 +1,27 @@
+PLINK v1.90b6.25 64-bit (5 Mar 2022)
+Options in effect:
+  --bfile output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf
+  --genome
+  --out output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf
+
+Hostname: AG-GDEV-1QXQ05P
+Working directory: /Users/lbd54/Documents/GitHub/EMBRAPAImputation2022
+Start time: Fri May 20 14:31:50 2022
+
+Random number seed: 1653071510
+16384 MB RAM detected; reserving 8192 MB for main workspace.
+1560 variants loaded from .bim file.
+2072 people (0 males, 0 females, 2072 ambiguous) loaded from .fam.
+Ambiguous sex IDs written to
+output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf.nosex .
+Using up to 8 threads (change this with --threads).
+Before main variant filters, 2072 founders and 0 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.398914.
+1560 variants and 2072 people pass filters and QC.
+Note: No phenotypes present.
+IBD calculations complete.
+Finished writing
+output/DCas22_6902/AllSamplesGBSDArTCommonSitesFiltered.vcf.genome .
+
+End time: Fri May 20 14:31:51 2022

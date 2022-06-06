@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="LucianoRogerio" />
+
+<meta name="date" content="2022-05-16" />
+
+<title>Duplicates</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/core-js-2.5.3/shim.min.js"></script>
+<script src="site_libs/react-17.0.0/react.min.js"></script>
+<script src="site_libs/react-17.0.0/react-dom.min.js"></script>
+<script src="site_libs/reactwidget-1.0.0/react-tools.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/reactable-binding-0.2.3/reactable.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">EMBRAPAImputation2022</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Imputations
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="Duplicates.html">Check Duplicates</a>
+    </li>
+    <li>
+      <a href="DArTImp.html">DArT Imputation</a>
+    </li>
+    <li>
+      <a href="GBS_DArTImp.html">GBS + DArT Imputation</a>
+    </li>
+    <li>
+      <a href="CheckImp.html">Imputation Results</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Genomic Prediction
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="PrepareGenData.html">GenData</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Duplicates</h1>
+<h4 class="author">LucianoRogerio</h4>
+<h4 class="date">2022-05-16</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-06-02
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>EMBRAPAImputation2022/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The R Markdown is untracked by Git. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20220303code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20220303)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20220303code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20220303)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomLucianoRogerioEMBRAPAImputation2022tree95ddcafcdb4a5ce6575fdea5189589529991847atargetblank95ddcafa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/LucianoRogerio/EMBRAPAImputation2022/tree/95ddcafcdb4a5ce6575fdea5189589529991847a" target="_blank">95ddcaf</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomLucianoRogerioEMBRAPAImputation2022tree95ddcafcdb4a5ce6575fdea5189589529991847atargetblank95ddcafa" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/LucianoRogerio/EMBRAPAImputation2022/tree/95ddcafcdb4a5ce6575fdea5189589529991847a" target="_blank">95ddcaf</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/DArT2018/
+    Ignored:    data/DArT2020/
+    Ignored:    data/DArT2022/
+    Ignored:    data/GBS/
+    Ignored:    output/DArT2022/
+
+Untracked files:
+    Untracked:  DArTCommonMkrs.log
+    Untracked:  MkrsRefandStudyPop.txt
+    Untracked:  analysis/CheckImp.Rmd
+    Untracked:  analysis/Duplicates.Rmd
+    Untracked:  analysis/ImputationEMBRAPA_DCas22_6902.Rmd
+    Untracked:  analysis/PrepareGenData.Rmd
+    Untracked:  code/.DS_Store
+    Untracked:  code/plink/
+    Untracked:  data/AllDArTDuplicates.txt
+    Untracked:  data/CommonMkrsGBSDArT
+    Untracked:  data/CommonMkrsGBSDArT.txt
+    Untracked:  data/CommonMkrsGBSDArTIssues
+    Untracked:  data/DArTClones.csv
+    Untracked:  data/DArTDupDiscordanceIndex.csv
+    Untracked:  data/DArTDuplicates1.txt
+    Untracked:  data/DArTDuplicates2.txt
+    Untracked:  data/DArTDuplicates3.txt
+    Untracked:  data/DArTDuplicates4.txt
+    Untracked:  data/DArTGPInfo.csv
+    Untracked:  data/DArTGPInfo.xlsx
+    Untracked:  data/DArTGPInfo2.csv
+    Untracked:  data/DArTGPInfo2.xlsx
+    Untracked:  data/DArTGenotypingPlates/
+    Untracked:  out.log
+    Untracked:  output/AllChrDCas22_6902_StudyPopimputed.vcf.gz
+    Untracked:  output/AllChrDCas22_6902_StudyPopimputed.vcf.gz.tbi
+    Untracked:  output/AllChrGBSandDArTsitesCommonClones_RefPopImputed.vcf.gz
+    Untracked:  output/AllChrGBSandDArTsitesCommonClones_RefPopImputed.vcf.gz.tbi
+    Untracked:  output/BRTP_Phenotyping2022.txt
+    Untracked:  output/DCas22_6902/
+    Untracked:  output/DCas22_6902RefPopImputed.vcf.gz
+    Untracked:  output/Dados GBS Atualizados.RData
+    Untracked:  output/DadosGBSAtualizados.rds
+    Untracked:  output/DadosGBSAtualizadosRenomeados.rds
+    Untracked:  output/Duplicates/
+    Untracked:  output/Figures/
+    Untracked:  output/GBSDArTPCA.rds
+    Untracked:  output/GmatrixDArTGS.rds
+    Untracked:  output/GmatrixGBSandDArTGS.rds
+    Untracked:  output/RefPop/
+    Untracked:  output/StudyPop/
+
+Unstaged changes:
+    Modified:   .DS_Store
+    Modified:   analysis/DArTImp.Rmd
+    Modified:   analysis/GBS_DArTImp.Rmd
+    Modified:   analysis/_site.yml
+    Modified:   analysis/index.Rmd
+    Modified:   data/.DS_Store
+    Modified:   output/.DS_Store
+    Modified:   output/out.log
+
+Staged changes:
+    Modified:   .DS_Store
+    New:        analysis/DArTImp.Rmd
+    New:        analysis/GBS_DArTImp.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div id="duplicates-in-gbs" class="section level2">
+<h2>Duplicates in GBS</h2>
+<pre class="r"><code>source(paste0(&quot;vcftools --gzvcf data/GBS/tassel_embrapa_newfastq.bial.recode.vcf.gz &quot;,
+       &quot;--keep data/GBS/GBSDuplicates&quot;, 1:3, &quot;.txt --recode --stdout &gt; &quot;,
+       &quot;output/Duplicates/GBSDuplicatesFile&quot;, 1:3, &quot;.vcf&quot;))
+
+GBSDup1 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile1.vcf&quot;),
+                      skip = 31, header = T, comment.char = &quot;&quot;, check.names = F)
+GBSDup2 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile2.vcf&quot;),
+                      skip = 31, header = T, comment.char = &quot;&quot;, check.names = F)
+GBSDup3 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile3.vcf&quot;),
+                      skip = 31, header = T, comment.char = &quot;&quot;, check.names = F)
+
+GBSClones &lt;- read.table(file = here::here(&quot;data&quot;, &quot;GBS&quot;, &quot;EM_matched_accessions-GBS.csv&quot;),
+                        sep = &quot;,&quot;, header = T)
+
+colnames(GBSDup1)[10:ncol(GBSDup1)] &lt;- GBSClones$uniquename_in_db[match(colnames(GBSDup1)[10:ncol(GBSDup1)], GBSClones$x)]
+colnames(GBSDup2)[10:ncol(GBSDup2)] &lt;- GBSClones$uniquename_in_db[match(colnames(GBSDup2)[10:ncol(GBSDup2)], GBSClones$x)]
+colnames(GBSDup3)[10:ncol(GBSDup3)] &lt;- GBSClones$uniquename_in_db[match(colnames(GBSDup3)[10:ncol(GBSDup3)], GBSClones$x)]
+
+header &lt;- c(&quot;##fileformat=VCFv4.0&quot;,
+            &quot;##FILTER=&lt;ID=PASS,Description=\&quot;All filters passed\&quot;&gt;&quot;,
+            &quot;##Tassel=&lt;ID=GenotypeTable,Version=5,Description=\&quot;Reference allele is not known. The major allele was used as reference allele\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=\&quot;Genotype\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=\&quot;Allelic depths for the reference and alternate alleles in the order listed\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Read Depth (only filtered reads used for calling)\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=GQ,Number=1,Type=Float,Description=\&quot;Genotype Quality\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=PL,Number=.,Type=Float,Description=\&quot;Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\&quot;&gt;&quot;,
+            &quot;##INFO=&lt;ID=NS,Number=1,Type=Integer,Description=\&quot;Number of Samples With Data\&quot;&gt;&quot;,
+            &quot;##INFO=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Total Depth\&quot;&gt;&quot;,
+            &quot;##INFO=&lt;ID=AF,Number=.,Type=Float,Description=\&quot;Allele Frequency\&quot;&gt;&quot;,
+            &quot;##contig=&lt;ID=1&gt;&quot;,
+            &quot;##contig=&lt;ID=2&gt;&quot;,
+            &quot;##contig=&lt;ID=3&gt;&quot;,
+            &quot;##contig=&lt;ID=4&gt;&quot;,
+            &quot;##contig=&lt;ID=5&gt;&quot;,
+            &quot;##contig=&lt;ID=6&gt;&quot;,
+            &quot;##contig=&lt;ID=7&gt;&quot;,
+            &quot;##contig=&lt;ID=8&gt;&quot;,
+            &quot;##contig=&lt;ID=9&gt;&quot;,
+            &quot;##contig=&lt;ID=10&gt;&quot;,
+            &quot;##contig=&lt;ID=11&gt;&quot;,
+            &quot;##contig=&lt;ID=12&gt;&quot;,
+            &quot;##contig=&lt;ID=13&gt;&quot;,
+            &quot;##contig=&lt;ID=14&gt;&quot;,
+            &quot;##contig=&lt;ID=15&gt;&quot;,
+            &quot;##contig=&lt;ID=16&gt;&quot;,
+            &quot;##contig=&lt;ID=17&gt;&quot;,
+            &quot;##contig=&lt;ID=18&gt;&quot;,
+            &quot;##bcftools_concatVersion=1.14+htslib-1.14&quot;,
+            &quot;##bcftools_concatCommand=concat --output tassel_embrapa_newfastq.bial.recode.vcf&quot;)
+
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile1renamed.vcf&quot;),
+            append = F)
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile2renamed.vcf&quot;),
+            append = F)
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile3renamed.vcf&quot;),
+            append = F)
+write.table(x = GBSDup1, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile1renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)
+write.table(x = GBSDup2, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile2renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)
+write.table(x = GBSDup3, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDuplicatesFile3renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)</code></pre>
+<pre class="bash"><code>bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile1renamed.vcf &gt; output/Duplicates/GBSDuplicatesFile1renamed.vcf.gz
+
+bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile2renamed.vcf &gt; output/Duplicates/GBSDuplicatesFile2renamed.vcf.gz
+
+bgzip -c -@ 6 output/Duplicates/GBSDuplicatesFile3renamed.vcf &gt; output/Duplicates/GBSDuplicatesFile3renamed.vcf.gz</code></pre>
+<div id="comparing-the-duplicates" class="section level3">
+<h3>Comparing the Duplicates</h3>
+<pre class="bash"><code>vcftools --gzvcf output/Duplicates/GBSDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile2renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup1_2 &amp;
+
+vcftools --gzvcf output/Duplicates/GBSDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup1_3 &amp;
+
+vcftools --gzvcf output/Duplicates/GBSDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/GBSDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/GBSDup2_3 &amp;</code></pre>
+</div>
+<div id="joint-the-results" class="section level3">
+<h3>Joint the results</h3>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.3.6     ✔ purrr   0.3.4
+✔ tibble  3.1.7     ✔ dplyr   1.0.9
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>GBSDup1_3 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDup1_2.diff.indv&quot;),
+                        sep = &quot;\t&quot;, header = T, check.names = F) %&gt;%
+  mutate(COMP1 = 1,
+         COMP2 = 2) %&gt;% 
+  rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDup1_3.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;%
+          mutate(COMP1 = 1,
+                 COMP2 = 3)) %&gt;%
+  rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;GBSDup2_3.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;% 
+          mutate(COMP1 = 2,
+                 COMP2 = 3)) %&gt;%
+  filter(!is.na(DISCORDANCE)) %&gt;%
+  mutate(N_NA = 400122 - N_COMMON_CALLED) %&gt;%
+  select(INDV, COMP1, COMP2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE) %&gt;% arrange(INDV, COMP1, COMP2)
+
+AllGBSDup &lt;- read.table(file = here::here(&quot;data&quot;, &quot;GBS&quot;, &quot;AllGBSDuplicates.txt&quot;),
+                        header = T, sep = &quot;\t&quot;)
+
+GBSDup1_3 %&lt;&gt;% left_join(AllGBSDup, by = c(&quot;INDV&quot; = &quot;uniquename_in_db&quot;, &quot;COMP1&quot; = &quot;FILE&quot;)) %&gt;% 
+  rename(INDV1 = x) %&gt;% left_join(AllGBSDup, by = c(&quot;INDV&quot; = &quot;uniquename_in_db&quot;, &quot;COMP2&quot; = &quot;FILE&quot;)) %&gt;% 
+  rename(INDV2 = x) %&gt;% select(INDV, INDV1, INDV2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE)
+
+write.table(GBSDup1_3, file = here::here(&quot;data&quot;, &quot;GBS&quot;, &quot;GBSDupDiscordanceIndex.csv&quot;),
+            quote = F, sep = &quot;,&quot;, dec = &quot;.&quot;, row.names = F)</code></pre>
+</div>
+<div id="table-1.-discordance-index-from-vcftools-software-for-all-the-duplicates-in-gbs-genotyping-platform." class="section level3">
+<h3>Table 1. Discordance index from <em>vcftools</em> software for all the duplicates in GBS genotyping platform.</h3>
+<div id="htmlwidget-d106d9369305afc41589" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-d106d9369305afc41589">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"INDV":["BGM-0020","BGM-0021","BGM-0023","BGM-0024","BGM-0040","BGM-0043","BGM-0063","BGM-0076","BGM-0104","BGM-0106","BGM-0119","BGM-0120","BGM-0120","BGM-0120","BGM-0128","BGM-0130","BGM-0170","BGM-0222","BGM-0252","BGM-0260","BGM-0270","BGM-0281","BGM-0290","BGM-0365","BGM-0374","BGM-0374","BGM-0374","BGM-0468","BGM-0537","BGM-0555","BGM-0570","BGM-0574","BGM-0600","BGM-0611","BGM-0649","BGM-0650","BGM-0685","BGM-0695","BGM-0752","BGM-0817","BGM-0830","BGM-0834","BGM-0854","BGM-0872","BGM-0876","BGM-0886","BGM-0932","BGM-0944","BGM-0945","BGM-0953","BGM-0954","BGM-1015","BGM-1037","BGM-1077","BGM-1107","BGM-1148","BGM-1160","BGM-1165","BGM-1186","BGM-1253","BGM-1255","BGM-1269","BGM-1277","BGM-1310","BGM-1311","BGM-1316","BGM-1335","BGM-1348","BGM-1361","BGM-1370","BGM-1381","BGM-1396","BGM-1398","BGM-1407","BGM-1409","BGM-1416","BGM-1464","BGM-1491","BGM-1524","BGM-1526","BGM-1547","BGM-1550","BGM-1563","BGM-1584","BGM-1614","BGM-1616","BGM-1660","BGM-1680","BGM-1681","BGM-1728","BGM-1749","BGM-1765","BGM-1817","BGM-1818","BGM-2004","BGM-2019","BGM-2019","BGM-2019","BGM-2038","BGM-2042","BGM-2044","BGM-2091","BGM-2093","BGM-2095","BGM-2095","BGM-2095","BGM-2099","BGM-2102","BGM-2103","BGM-2104","BGM-2105","BGM-2110","BGM-2192","BGM-2235","BGM-2291","BR-12-108-002","BR-12-108-002","BR-12-108-002","BR-12-108-173","BR-12-108-187","BR-12-108-215","BRS-Caipira","BRS-NovoHorizonte","BRS-Tapioqueira","BRS-Verdinha","CPAC-0438","ECU72","S1-1335-15","TSA-0468","TSA-0471","TSA-0490","TSA-0494"],"INDV1":["CNPMF20:250370244","CNPMF21:250370245","CNPMF23:250370257","CNPMF24:250370268","CNPMF40:250370247","CNPMF43:250370270","BRA846:250327481","CNPMF76:250370333","PRETINHA_1","CNPMF106:250370264","CNPMF119:250370289","PAULO_ROSA","PAULO_ROSA","CNPMF120:250370300","CNPMF128:250370337","Cramuquem:250437504","PRETINHA_2","PARENTAL_222","BGM0252:250581762","CNPMF260:250370404","Paraguai:250437625","CNPMF281:250370509","CNPMF290:250370568","CNPMF365:250370527","BRA222:250327460","BRA222:250327460","BGM0374:250581772","CNPMF468:250370685","DO_CEU","IsabeldeSouza225:250437573","CNPMF570:250370706","CNPMF574:250370718","CNPMF600:250370811","CNPMF611:250370764","CNPMF649:250370815","CNPMF650:250370826","NassGig:250437615","CNPMF695:250370818","CNPMF752:250370845","CNPMF817:250370952","CNPMF830:250370918","CNPMF834:250370941","CNPMF854:250370920","CNPMF872:250370886","CNPMF876:250370909","CNPMF886:250370945","BGM0932:250494246","BRA467:250327469","BRA468:250327470","BRA492:250327471","BRA1320:250327494","BRA707:250327476","BRA1168:250327491","BRA1173:250327492","CNPMF1107:250371006","CNPMF1148:250371093","CNPMF1160:250371046","CNPMF1165:250371071","CNPMF1186:250371060","CNPMF1253:250372092","CNPMF1255:250372104","CNPMF1269:250372059","CNPMF1277:250372094","CNPMF1310:250372051","CNPMF1311:250372062","CNPMF1316:250372075","CNPMF1335:250372053","CNPMF1348:250372100","CNPMF1361:250372054","CNPMF1370:250372103","CNPMF1381:250372159","CNPMF1396:250372219","CNPMF1398:250372231","CNPMF1407:250372173","CNPMF1409:250372185","CNPMF1416:250372221","Espeto:250380461","CNPMF1491:250372228","CNPMF1524:250406969","CNPMF1526:250406981","CNPMF1547:250406948","CNPMF1550:250406960","ENGANA_LADRAO","CNPMF1584:250406950","CNPMF1614:250406988","CNPMF1616:250407000","CNPMF1660:250407004","CNPMF1680:250368893","CNPMF1681:250368894","CNPMF1728:250368934","Peixe:250437627","CNPMF1765:250368867","BGM1817:250437435","CNPMF1818:250380427","CPAC_BGM2004:250492360","BGM2019CMeBag4:250494266","BGM2019CMeBag4:250494266","BGM2019Bag1:250494274","TaloBranco:250437707","CNPMF2042:250380413","CNPMF2044:250380425","BGM2091:250581746","BrancaSC:250437487","Corrente:250380460","Corrente:250380460","BGM2095","FFit_o:250380472","IAC_90:250437572","IACCapora:250380497","IAC14:250380496","IAC576:250380485","Mico:250437601","Branca3P:250437486","ParaguPR:250437618","MANZTIL_199:250581735","2012_108_002","2012_108_002","108_002:250437711","2012_108_173","2012_108_187","2012_108_215","965502:250370266","9815006:250370267","960707:250370254","960202:250370243","CPAC_438:250492092","ECU72:250437567","1335_15:250581812","TSA468:250494198","TSA471:250494199","TSA490:250494221","TSA494:250494223"],"INDV2":["BRA29:250327452","CACHIMBO","BGM0023:250437172","BGM0024:250437180","BRA499:250327472","BRA834:250327478","BGM0063:250437173","BRA172:250327458","CNPMF104:250370253","BRA146:250327457","BRA842:250327480","CNPMF120:250370300","PauloRosa:250437619","PauloRosa:250437619","BRA847:250327482","CNPMF130:250370369","CNPMF170:250370385","CNPMF222:250370390","AIPIM_MANTEIGA","BRA134:250327456","CNPMF270:250370451","BRA125:250327455","BGM0290:250581760","AguaMorna:250500396","BGM0374:250581772","CNPMF374:250370562","CNPMF374:250370562","BRA803:250327477","CNPMF537:250370644","CNPMF555:250370634","BRA975:250327484","BRA240:250327461","BRA997:250327485","BGM0611:250437190","BGM0649:250437198","BGM650:250494276","CNPMF685:250370795","BRA1003:250327486","BRA1444:250327496","BRA1016:250327488","BGM0830:250437193","BGM0834:250437194","BGM0854:250437202","BRA327:250327463","BRA835:250327479","BRA335:250327464","BGM0932","BGM0944:250437232","BGM0945:250437225","BGM0953:250437244","BGM0954:250437237","BGM1015:250437304","BGM1037:250437317","BGM1077:250437333","Can_rio:250437499","Abacate:250437470","BGM1160:250494277","BRA325:250327462","BRA354:250327466","BGM1253:250494285","BGM1255:250494278","BRA1394:250327495","BGM1277:250437346","BGM1310:250494286","BGM1311:250437348","BGM1316:250494279","BGM1335:250494287","BGM1348:250437351","BGM1361:250437880","BGM1370:250437361","BGM1381:250494288","BGM1396:250494281","BGM1398:250494289","BGM1407:250437373","BGM1409:250437873","BGM1416:250437374","CNPMF1464:250380445","BGM1491:250437368","BGM1524:250437378","BGM1526:250437386","BGM1547:250437380","BGM1550:250437388","CNPMF1563:250406996","BGM1584:250437389","BGM1614:250437390","BGM1616:250437383","Aimpim_Brasil:250437471","CNPMF1680:250368845","CNPMF1681:250368846","BGM1728:250494282","CNPMF1749:250368877","BGM1765:250494290","AmareloI:250437482","Ab_bora:250437463","BGM2004:250581763","BGM2019Bag1:250494274","CNPMF2019:250380419","CNPMF2019:250380419","CNPMF2038:250380492","BGM_2042","BGM2044","AtimopC:250380470","BrancaSC:250380437","BGM2095","Corrente:250494284","Corrente:250494284","F_Fit_o:250437570","BGM2102","BGM_2103","BGM2104","BGM_2105","BGM_2110","Branca3P:250380436","BGM2235:250581751","MANZHITIL","108_002:250437711","2012_108_02","2012_108_02","108_173:250437856","108_187:250437182","108_215:250437353","BRSCaipira:250437490","BGM_2124","BRSTapioqueira:250437498","Verdinha:250380491","CPAC_438:250492084","ECU72:250327610","1335_15:250581811","TSA468:250437892","TSA471:250437900","TSA490:250437893","TSA494:250437901"],"N_NA":[194696,196085,221747,204599,224752,223046,185587,190710,359587,241950,207671,211397,195391,208813,205289,204768,235719,181325,122351,176264,192372,198532,212069,212983,155000,205903,199020,224068,243733,240473,243359,249410,204655,198535,211819,397708,197912,204749,206857,179265,194038,193083,186563,177663,179864,206925,177588,173414,167570,182579,193794,189688,194860,185155,197603,201196,399186,215198,217846,400095,399537,239551,235478,400072,228618,399675,399532,238368,212374,217824,399989,400115,399754,199425,187557,223500,227291,223696,211496,222441,194479,193794,209560,218214,209452,200894,204584,204635,205907,395456,198576,380921,184985,199298,158323,196874,216092,228489,211218,205006,247449,184562,208934,394313,394453,179040,195763,165536,173519,170954,171474,159419,205175,160716,146452,187445,157745,181653,158362,178549,181280,207418,206840,212166,207296,221196,177869,158741,239965,213445,175176,203935],"N_COMMON_CALLED":[205426,204037,178375,195523,175370,177076,214535,209412,40535,158172,192451,188725,204731,191309,194833,195354,164403,218797,277771,223858,207750,201590,188053,187139,245122,194219,201102,176054,156389,159649,156763,150712,195467,201587,188303,2414,202210,195373,193265,220857,206084,207039,213559,222459,220258,193197,222534,226708,232552,217543,206328,210434,205262,214967,202519,198926,936,184924,182276,27,585,160571,164644,50,171504,447,590,161754,187748,182298,133,7,368,200697,212565,176622,172831,176426,188626,177681,205643,206328,190562,181908,190670,199228,195538,195487,194215,4666,201546,19201,215137,200824,241799,203248,184030,171633,188904,195116,152673,215560,191188,5809,5669,221082,204359,234586,226603,229168,228648,240703,194947,239406,253670,212677,242377,218469,241760,221573,218842,192704,193282,187956,192826,178926,222253,241381,160157,186677,224946,196187],"N_DISCORD":[20114,6423,4852,6166,14041,6073,18527,6433,2802,11035,18354,5430,6090,5311,17515,13927,12539,8004,7057,7571,6037,6828,16732,16589,26987,17121,6666,15451,12417,11856,11880,10775,16054,4844,4921,111,18973,17379,18378,7044,6569,6705,6513,7304,6778,16965,7658,20472,6967,20636,6439,19427,20672,6869,15252,5952,66,14983,15795,4,32,12755,12641,3,5044,18,28,4519,5937,5553,11,0,31,6865,5992,5709,13725,5124,5285,5157,5924,6366,16761,5358,5071,5697,5843,15804,16064,249,16927,1055,19130,11751,5843,6648,15551,13449,5650,5719,11064,6161,6152,358,318,8222,6228,7733,6419,6939,6755,20731,10259,7537,30413,7015,8358,7351,7978,7374,7066,5682,6176,5619,5226,5324,7140,10940,4457,6571,7118,6427],"DISCORDANCE":[0.0979136,0.0314796,0.0272011,0.0315359,0.080065,0.034296,0.0863589,0.0307193,0.0691254,0.0697658,0.0953697,0.028772,0.0297464,0.0277614,0.0898975,0.0712911,0.0762699,0.0365819,0.0254058,0.0338205,0.029059,0.0338707,0.0889749,0.0886453,0.110096,0.0881531,0.0331474,0.0877628,0.0793982,0.0742629,0.0757832,0.071494,0.0821315,0.0240293,0.0261334,0.0459818,0.0938282,0.0889529,0.0950922,0.0318939,0.0318754,0.0323852,0.0304974,0.032833,0.030773,0.0878119,0.0344127,0.0903012,0.0299589,0.0948594,0.0312076,0.0923187,0.10071,0.0319537,0.0753115,0.0299207,0.0705128,0.0810225,0.0866543,0.148148,0.0547009,0.0794353,0.0767778,0.06,0.0294104,0.0402685,0.0474576,0.0279375,0.0316222,0.0304611,0.0827068,0,0.0842391,0.0342058,0.028189,0.0323233,0.0794128,0.0290433,0.0280184,0.0290239,0.0288072,0.0308538,0.0879556,0.0294544,0.0265957,0.0285954,0.0298817,0.0808443,0.0827125,0.0533648,0.0839858,0.0549451,0.0889201,0.0585139,0.0241647,0.0327088,0.0845025,0.0783591,0.0299094,0.0293108,0.0724686,0.0285814,0.0321778,0.0616285,0.0560945,0.0371898,0.0304758,0.0329645,0.0283271,0.0302791,0.0295432,0.0861269,0.0526246,0.0314821,0.119892,0.0329843,0.0344835,0.0336478,0.0329997,0.0332802,0.0322881,0.0294856,0.0319533,0.0298953,0.0271022,0.0297553,0.0321256,0.0453225,0.0278289,0.0351998,0.0316431,0.0327596]},"columns":[{"accessor":"INDV","name":"INDV","type":"character"},{"accessor":"INDV1","name":"INDV1","type":"character"},{"accessor":"INDV2","name":"INDV2","type":"character"},{"accessor":"N_NA","name":"N_NA","type":"numeric"},{"accessor":"N_COMMON_CALLED","name":"N_COMMON_CALLED","type":"numeric"},{"accessor":"N_DISCORD","name":"N_DISCORD","type":"numeric"},{"accessor":"DISCORDANCE","name":"DISCORDANCE","type":"numeric","format":{"cell":{"digits":4,"locales":"en-US"},"aggregated":{"digits":4,"locales":"en-US"}}}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"dataKey":"8c815d3acb2bfe9570bf72c4795b70ed","key":"8c815d3acb2bfe9570bf72c4795b70ed"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div id="duplicates-in-dart" class="section level2">
+<h2>Duplicates in DArT</h2>
+<pre class="r"><code>source(paste0(&quot;vcftools --gzvcf output/DArT2022/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz &quot;,
+       &quot;--keep data/DArTDuplicates&quot;, 1:4, &quot;.txt --recode --stdout &gt; &quot;,
+       &quot;output/Duplicates/DArTDuplicatesFile&quot;, 1:4, &quot;.vcf&quot;))
+
+DArTDup1 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile1.vcf&quot;),
+                       header = T, comment.char = &quot;&quot;, check.names = F)
+DArTDup2 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile2.vcf&quot;),
+                       header = T, comment.char = &quot;&quot;, check.names = F)
+DArTDup3 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile3.vcf&quot;),
+                       header = T, comment.char = &quot;&quot;, check.names = F)
+DArTDup4 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile4.vcf&quot;),
+                       header = T, comment.char = &quot;&quot;, check.names = F)
+
+DArTClones &lt;- read.table(file = here::here(&quot;data&quot;, &quot;DArTGPInfo2.csv&quot;),
+                         sep = &quot;,&quot;, header = T)
+
+colnames(DArTDup1)[10:ncol(DArTDup1)] &lt;- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup1)[10:ncol(DArTDup1)], DArTClones$DarTMatch)]
+colnames(DArTDup2)[10:ncol(DArTDup2)] &lt;- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup2)[10:ncol(DArTDup2)], DArTClones$DarTMatch)]
+colnames(DArTDup3)[10:ncol(DArTDup3)] &lt;- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup3)[10:ncol(DArTDup3)], DArTClones$DarTMatch)]
+colnames(DArTDup4)[10:ncol(DArTDup4)] &lt;- DArTClones$Observation_unit_name[
+  match(colnames(DArTDup4)[10:ncol(DArTDup4)], DArTClones$DarTMatch)]
+
+header &lt;- c(&quot;##fileformat=VCFv4.0&quot;,
+            &quot;##FORMAT=&lt;ID=GT,Number=1,Type=String,Description=\&quot;Genotype\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=AD,Number=.,Type=Integer,Description=\&quot;Allelic depths for the reference and alternate alleles in the order listed\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=DP,Number=1,Type=Integer,Description=\&quot;Read Depth (only filtered reads used for calling)\&quot;&gt;&quot;,
+            &quot;##FORMAT=&lt;ID=PL,Number=3,Type=Float,Description=\&quot;Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic\&quot;&gt;&quot;)
+
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile1renamed.vcf&quot;),
+            append = F)
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile2renamed.vcf&quot;),
+            append = F)
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile3renamed.vcf&quot;),
+            append = F)
+write_lines(header, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile4renamed.vcf&quot;),
+            append = F)
+write.table(x = DArTDup1, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile1renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)
+write.table(x = DArTDup2, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile2renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)
+write.table(x = DArTDup3, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile3renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)
+write.table(x = DArTDup4, file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDuplicatesFile4renamed.vcf&quot;),
+            quote = F, row.names = F, append = T, col.names = T, sep = &quot;\t&quot;)</code></pre>
+<pre class="r"><code>source(paste0(&quot;bgzip -c -@ 6 output/Duplicates/DArTDuplicatesFile&quot;, 1:4, &quot;renamed.vcf &gt; output/Duplicates/DArTDuplicatesFile&quot;, 1:4, &quot;renamed.vcf.gz&quot;))</code></pre>
+<div id="comparing-the-duplicates-1" class="section level3">
+<h3>Comparing the Duplicates</h3>
+<pre class="bash"><code>vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile2renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_2
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_3
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile1renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup1_4
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile3renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup2_3
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile2renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup2_4
+
+vcftools --gzvcf output/Duplicates/DArTDuplicatesFile3renamed.vcf --gzdiff \
+output/Duplicates/DArTDuplicatesFile4renamed.vcf --diff-indv-discordance --out output/Duplicates/DArTDup3_4</code></pre>
+</div>
+<div id="joint-the-results-1" class="section level3">
+<h3>Joint the results</h3>
+<pre class="r"><code>DArTDup1_4 &lt;- read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup1_2.diff.indv&quot;),
+                        sep = &quot;\t&quot;, header = T, check.names = F) %&gt;%
+  mutate(COMP1 = 1,
+         COMP2 = 2) %&gt;% 
+  rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup1_3.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;%
+          mutate(COMP1 = 1,
+                 COMP2 = 3)) %&gt;%
+    rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup1_4.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;%
+          mutate(COMP1 = 1,
+                 COMP2 = 4)) %&gt;%
+  rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup2_3.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;% 
+          mutate(COMP1 = 2,
+                 COMP2 = 3)) %&gt;%
+    rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup2_4.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;% 
+          mutate(COMP1 = 2,
+                 COMP2 = 4)) %&gt;%
+      rbind(read.table(file = here::here(&quot;output&quot;, &quot;Duplicates&quot;, &quot;DArTDup3_4.diff.indv&quot;),
+                   sep = &quot;\t&quot;, header = T, check.names = F) %&gt;% 
+          mutate(COMP1 = 3,
+                 COMP2 = 4)) %&gt;%
+  filter(!is.na(DISCORDANCE)) %&gt;%
+  mutate(N_NA = 12981 - N_COMMON_CALLED) %&gt;%
+  select(INDV, COMP1, COMP2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE) %&gt;% arrange(INDV, COMP1, COMP2)
+
+AllDArTDup &lt;- read.table(file = here::here(&quot;data&quot;, &quot;AllDArTDuplicates.txt&quot;),
+                        header = T, sep = &quot;\t&quot;)
+
+DArTDup1_4 %&lt;&gt;% left_join(AllDArTDup, by = c(&quot;INDV&quot; = &quot;Observation_unit_name&quot;, &quot;COMP1&quot; = &quot;FILE&quot;)) %&gt;% 
+  rename(INDV1 = DarTMatch) %&gt;% left_join(AllDArTDup, by = c(&quot;INDV&quot; = &quot;Observation_unit_name&quot;, &quot;COMP2&quot; = &quot;FILE&quot;)) %&gt;% 
+  rename(INDV2 = DarTMatch) %&gt;% select(INDV, INDV1, INDV2, N_NA, N_COMMON_CALLED, N_DISCORD, DISCORDANCE)
+
+write.table(DArTDup1_4, file = here::here(&quot;data&quot;, &quot;DArTDupDiscordanceIndex.csv&quot;),
+            quote = F, sep = &quot;,&quot;, dec = &quot;.&quot;, row.names = F)</code></pre>
+</div>
+<div id="table-2.-discordance-index-from-vcftools-software-for-all-the-duplicates-in-dart-genotyping-platform." class="section level3">
+<h3>Table 2. Discordance index from <em>vcftools</em> software for all the duplicates in DArT genotyping platform.</h3>
+<div id="htmlwidget-a4659078901b793d8d1b" class="reactable html-widget" style="width:auto;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a4659078901b793d8d1b">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"INDV":["Aipim-Abacate-2","Baianinha","Baianinha","Baianinha","BGM-0022","BGM-0022-TB","BGM-0022-TB","BGM-0022-TB","BGM-0022-TR","BGM-0022-TR","BGM-0022-TR","BGM-0023","BGM-0023","BGM-0023","BGM-0028","BGM-0028","BGM-0028","BGM-0032","BGM-0032","BGM-0032","BGM-0042","BGM-0042","BGM-0042","BGM-0043","BGM-0060","BGM-0060","BGM-0060","BGM-0062","BGM-0062","BGM-0062","BGM-0069","BGM-0069","BGM-0069","BGM-0082","BGM-0088","BGM-0088","BGM-0088","BGM-0090","BGM-0096","BGM-0113-RcxCr","BGM-0113-RcxRos","BGM-0115","BGM-0115-TB","BGM-0115-TR","BGM-0124","BGM-0124","BGM-0124","BGM-0135","BGM-0135","BGM-0135","BGM-0150","BGM-0152","BGM-0162","BGM-0177","BGM-0179","BGM-0179","BGM-0179","BGM-0182","BGM-0184","BGM-0184","BGM-0184","BGM-0186","BGM-0186","BGM-0186","BGM-0187","BGM-0187","BGM-0187","BGM-0190","BGM-0190","BGM-0190","BGM-0209","BGM-0222","BGM-0222","BGM-0222","BGM-0257","BGM-0260","BGM-0266","BGM-0266","BGM-0266","BGM-0290","BGM-0290","BGM-0290","BGM-0290","BGM-0290","BGM-0290","BGM-0294","BGM-0294","BGM-0294","BGM-0318","BGM-0318","BGM-0318","BGM-0326","BGM-0326","BGM-0326","BGM-0362","BGM-0362","BGM-0362","BGM-0382","BGM-0382","BGM-0382","BGM-0390","BGM-0390","BGM-0390","BGM-0406","BGM-0406","BGM-0406","BGM-0422","BGM-0422","BGM-0422","BGM-0426","BGM-0426","BGM-0426","BGM-0428","BGM-0439","BGM-0439","BGM-0439","BGM-0452","BGM-0462","BGM-0462","BGM-0462","BGM-0465","BGM-0472","BGM-0472","BGM-0472","BGM-0500","BGM-0500","BGM-0500","BGM-0508","BGM-0508","BGM-0508","BGM-0517","BGM-0517","BGM-0517","BGM-0533","BGM-0537","BGM-0537","BGM-0537","BGM-0542","BGM-0543","BGM-0555","BGM-0555","BGM-0555","BGM-0579","BGM-0579","BGM-0579","BGM-0593","BGM-0593","BGM-0593","BGM-0620","BGM-0620","BGM-0620","BGM-0630","BGM-0630","BGM-0630","BGM-0655","BGM-0660","BGM-0660","BGM-0660","BGM-0662","BGM-0662","BGM-0662","BGM-0665","BGM-0665","BGM-0665","BGM-0666","BGM-0666","BGM-0666","BGM-0673","BGM-0677","BGM-0677","BGM-0677","BGM-0678","BGM-0678","BGM-0678","BGM-0694","BGM-0694","BGM-0694","BGM-0737","BGM-0779","BGM-0779","BGM-0779","BGM-0780","BGM-0780","BGM-0780","BGM-0805","BGM-0807","BGM-0812","BGM-0812","BGM-0812","BGM-0830","BGM-0830-TB","BGM-0830-TB","BGM-0830-TB","BGM-0843","BGM-0843","BGM-0843","BGM-0846","BGM-0856","BGM-0856","BGM-0856","BGM-0856-CCr","BGM-0856-CCr","BGM-0856-CCr","BGM-0856-CRx","BGM-0856-CRx","BGM-0856-CRx","BGM-0894","BGM-0894","BGM-0894","BGM-0905","BGM-0905","BGM-0905","BGM-0918","BGM-0918","BGM-0918","BGM-0931-T","BGM-0944","BGM-0955","BGM-0955","BGM-0955","BGM-0958","BGM-0958","BGM-0958","BGM-0968","BGM-0968","BGM-0968","BGM-0972","BGM-0976","BGM-0981","BGM-0981","BGM-0981","BGM-0995","BGM-0995","BGM-0995","BGM-1015","BGM-1015","BGM-1015","BGM-1025","BGM-1037","BGM-1037","BGM-1037","BGM-1073","BGM-1073","BGM-1073","BGM-1103","BGM-1103","BGM-1103","BGM-1111","BGM-1111","BGM-1111","BGM-1126","BGM-1126","BGM-1126","BGM-1136","BGM-1136","BGM-1136","BGM-1143","BGM-1143","BGM-1143","BGM-1148","BGM-1175","BGM-1175","BGM-1175","BGM-1200","BGM-1200","BGM-1200","BGM-1213","BGM-1213","BGM-1213","BGM-1223","BGM-1223","BGM-1223","BGM-1248","BGM-1248","BGM-1248","BGM-1251","BGM-1251","BGM-1251","BGM-1251-RM","BGM-1262","BGM-1262C","BGM-1262E","BGM-1294","BGM-1318","BGM-1318","BGM-1318","BGM-1323","BGM-1323","BGM-1323","BGM-1328","BGM-1328","BGM-1328","BGM-1332","BGM-1332","BGM-1332","BGM-1338","BGM-1338","BGM-1338","BGM-1366","BGM-1366","BGM-1366","BGM-1371","BGM-1393","BGM-1393","BGM-1393","BGM-1403","BGM-1415","BGM-1437","BGM-1437","BGM-1437","BGM-1453","BGM-1453","BGM-1453","BGM-1481","BGM-1481","BGM-1481","BGM-1485","BGM-1498","BGM-1498","BGM-1498","BGM-1502","BGM-1507","BGM-1515","BGM-1518","BGM-1518","BGM-1518","BGM-1530","BGM-1530","BGM-1530","BGM-1535","BGM-1535","BGM-1535","BGM-1537","BGM-1537","BGM-1537","BGM-1549","BGM-1586","BGM-1586","BGM-1586","BGM-1598","BGM-1598","BGM-1598","BGM-1604","BGM-1604","BGM-1604","BGM-1605","BGM-1610","BGM-1628","BGM-1628","BGM-1628","BGM-1649","BGM-1649","BGM-1649","BGM-1661","BGM-1661","BGM-1661","BGM-1680","BGM-1680","BGM-1680","BGM-1683","BGM-1683","BGM-1683","BGM-1691","BGM-1691","BGM-1691","BGM-1702","BGM-1702","BGM-1702","BGM-1722","BGM-1722(D)","BGM-1727","BGM-1727","BGM-1727","BGM-1739","BGM-1739","BGM-1739","BGM-1747","BGM-1747","BGM-1747","BGM-1753","BGM-1759","BGM-1759","BGM-1759","BGM-1759(B)","BGM-1769","BGM-1769","BGM-1769","BGM-1770","BGM-1771","BGM-1771","BGM-1771","BGM-1784","BGM-1784","BGM-1784","BGM-1810","BGM-1956","BGM-1956","BGM-1956","BGM-2019","BGM-2019","BGM-2019","BGM-2020","BGM-2020","BGM-2020","BGM-2035","BGM-2035","BGM-2035","BGM-2053","BGM-2054","BGM-2072","BGM-2072","BGM-2072","BGM-2082","BGM-2082","BGM-2082","BGM-2095","BGM-2095","BGM-2095","BGM-2098","BGM-2098","BGM-2098","BGM-2098","BGM-2098","BGM-2098","BGM-2111","BGM-2111","BGM-2111","BGM-2119","BGM-2119","BGM-2119","BGM-2127","BR-18GS-054-2","BR-18GS-063-16","BR-18GS-094-52","BR-18GS-107-3","BR-21GS-C3-015-25","BR-21GS-C3-016-21","BR-21GS-C3-019-5","BR-21GS-C3-032-48","BR-21GS-C3-036-29","BR-21GS-C3-036-39","BR-21GS-C3-036-4","BR-21GS-C3-059-62","BR-21GS-C3-087-3","BR-21GS-C3-093-5","BR-21GS-C3-114-4","BR-21GS-C3-146-32","BR-21GS-C3-290-2","BR-21GS-C3-293-10","BRS-420","BRS-Mulatinha","Maragojipe","TMEB14"],"INDV1":["Aipim.Abacate.2.1","Baianinha","Baianinha","BR.20.DArT.PL22_C10...Baianinha","BGM.0022.1","BGM.0022.TB.1","BGM.0022.TB.1","BGM.0022.TB","BGM.0022.TR.1","BGM.0022.TR.1","BGM.0022.TR","BGM.0023.2","BGM.0023.2","BGM.0023.1","BGM.0028.2","BGM.0028.2","BGM.0028.1","BGM.0032.2","BGM.0032.2","BGM.0032.1","BGM.0042.2","BGM.0042.2","BGM.0042.1","BGM.0043.1","BGM.0060.2","BGM.0060.2","BGM.0060.1","BGM.0062.2","BGM.0062.2","BGM.0062.1","BGM.0069.2","BGM.0069.2","BGM.0069.1","BGM.0082.","BGM.0088.2","BGM.0088.2","BGM.0088.1","BGM.0090.1","BGM.0096.1","BGM.0113.RcxCr.1","BGM.0113.RcxRos.1","BGM.0115.1","BGM.0115.TB.1","BGM.0115.TR.1","BGM.0124.2","BGM.0124.2","BGM.0124.1","BGM.0135","BGM.0135","BR.20.DArT.PL23_A02...BGM.0135","BGM.0150.1","BGM.0152.1","BGM.0162.1","BGM.0177.1","BGM.0179.2","BGM.0179.2","BGM.0179.1","BGM.0182.1","BGM.0184.2","BGM.0184.2","BGM.0184.1","BGM.0186.2","BGM.0186.2","BGM.0186.1","BGM.0187.2","BGM.0187.2","BGM.0187.1","BGM.0190.2","BGM.0190.2","BGM.0190.1","BGM.0209.1","BGM.0222.2","BGM.0222.2","BGM.0222.1","BGM.0257.1","BGM.0260","BGM.0266.2","BGM.0266.2","BGM.0266.1","BGM.0290.2","BGM.0290.2","BGM.0290.2","BGM.0290.1","BGM.0290.1","BGM.0290.3","BGM.0294","BGM.0294","BR.20.DArT.PL23_B02...BGM.0294","BGM.0318.2","BGM.0318.2","BGM.0318.1","BGM.0326.2","BGM.0326.2","BGM.0326.1","BGM.0362.2","BGM.0362.2","BGM.0362.1","BGM.0382.2","BGM.0382.2","BGM.0382.1","BGM.0390.2","BGM.0390.2","BGM.0390.1","BGM.0406.2","BGM.0406.2","BGM.0406.1","BGM.0422.2","BGM.0422.2","BGM.0422.1","BGM.0426.2","BGM.0426.2","BGM.0426.1","BGM.0428.1","BGM.0439.2","BGM.0439.2","BGM.0439.1","BGM.0452.1","BGM.0462.2","BGM.0462.2","BGM.0462.1","BGM.0465.1","BGM.0472.2","BGM.0472.2","BGM.0472.1","BGM.0500.2","BGM.0500.2","BGM.0500.1","BGM.0508.2","BGM.0508.2","BGM.0508.1","BGM.0517.2","BGM.0517.2","BGM.0517.1","BGM.0533.1","BGM.0537.2","BGM.0537.2","BGM.0537.1","BGM.0542.1","BGM.0543.1","BGM.0555.2","BGM.0555.2","BGM.0555.1","BGM.0579.2","BGM.0579.2","BGM.0579.1","BGM.0593.2","BGM.0593.2","BGM.0593.1","BGM.0620.2","BGM.0620.2","BGM.0620.1","BGM.0630.2","BGM.0630.2","BGM.0630.1","BGM.0655.1","BGM.0660.2","BGM.0660.2","BGM.0660.1","BGM.0662.2","BGM.0662.2","BGM.0662.1","BGM.0665.2","BGM.0665.2","BGM.0665.1","BGM.0666.2","BGM.0666.2","BGM.0666.1","BGM.0673.1","BGM.0677.2","BGM.0677.2","BGM.0677.1","BGM.0678.2","BGM.0678.2","BGM.0678.1","BGM.0694.2","BGM.0694.2","BGM.0694.1","BGM.0737.1","BGM.0779.2","BGM.0779.2","BGM.0779.1","BGM.0780.2","BGM.0780.2","BGM.0780.1","BGM.0805.1","BGM.0807.1","BGM.0812.2","BGM.0812.2","BGM.0812.1","BGM.0830.1","BGM.0830.TB","BGM.0830.TB","BR.20.DArT.PL22_G10...BGM.0830.TB","BGM.0843.2","BGM.0843.2","BGM.0843.1","BGM.0846.1","BGM.0856.2","BGM.0856.2","BGM.0856.1","BGM.0856.CCr","BGM.0856.CCr","BR.20.DArT.PL22_H10...BGM.0856.CCr","BGM.0856.CRx","BGM.0856.CRx","BR.20.DArT.PL22_A11...BGM.0856.CRx","BGM.0894.2","BGM.0894.2","BGM.0894.1","BGM.0905.2","BGM.0905.2","BGM.0905.1","BGM.0918.2","BGM.0918.2","BGM.0918.1","BGM.0931.","BGM.0944.1","BGM.0955.2","BGM.0955.2","BGM.0955.1","BGM.0958.2","BGM.0958.2","BGM.0958.1","BGM.0968.2","BGM.0968.2","BGM.0968.1","BGM.0972.1","BGM.0976.1","BGM.0981.2","BGM.0981.2","BGM.0981.1","BGM.0995.2","BGM.0995.2","BGM.0995.1","BGM.1015.2","BGM.1015.2","BGM.1015.1","BGM.1025.1","BGM.1037.2","BGM.1037.2","BGM.1037.1","BGM.1073.2","BGM.1073.2","BGM.1073.1","BGM.1103.2","BGM.1103.2","BGM.1103.1","BGM.1111.2","BGM.1111.2","BGM.1111.1","BGM.1126.2","BGM.1126.2","BGM.1126.1","BGM.1136.2","BGM.1136.2","BGM.1136.1","BGM.1143.2","BGM.1143.2","BGM.1143.1","BGM.1148.1","BGM.1175.2","BGM.1175.2","BGM.1175.1","BGM.1200.2","BGM.1200.2","BGM.1200.1","BGM.1213.2","BGM.1213.2","BGM.1213.1","BGM.1223.2","BGM.1223.2","BGM.1223.1","BGM.1248.2","BGM.1248.2","BGM.1248.1","BGM.1251.2","BGM.1251.2","BGM.1251.1","BGM.1251.RM","BGM.1262.1","BGM.1262C.1","BGM.1262E.1","BGM.1294.1","BGM.1318.2","BGM.1318.2","BGM.1318.1","BGM.1323.2","BGM.1323.2","BGM.1323.1","BGM.1328.2","BGM.1328.2","BGM.1328.1","BGM.1332.2","BGM.1332.2","BGM.1332.1","BGM.1338.2","BGM.1338.2","BGM.1338.1","BGM.1366.2","BGM.1366.2","BGM.1366.1","BGM.1371.1","BGM.1393.2","BGM.1393.2","BGM.1393.1","BGM.1403.1","BGM.1415.1","BGM.1437.2","BGM.1437.2","BGM.1437.1","BGM.1453.2","BGM.1453.2","BGM.1453.1","BGM.1481.2","BGM.1481.2","BGM.1481.1","BGM.1485.1","BGM.1498.2","BGM.1498.2","BGM.1498.1","BGM.1502.1","BGM.1507.1","BGM.1515.1","BGM.1518.2","BGM.1518.2","BGM.1518.1","BGM.1530","BGM.1530","BR.20.DArT.PL22_F12...BGM.1530","BGM.1535.2","BGM.1535.2","BGM.1535.1","BGM.1537.2","BGM.1537.2","BGM.1537.1","BGM.1549.1","BGM.1586.2","BGM.1586.2","BGM.1586.1","BGM.1598.2","BGM.1598.2","BGM.1598.1","BGM.1604.2","BGM.1604.2","BGM.1604.1","BGM.1605.1","BGM.1610.1","BGM.1628.2","BGM.1628.2","BGM.1628.1","BGM.1649.2","BGM.1649.2","BGM.1649.1","BGM.1661.2","BGM.1661.2","BGM.1661.1","BGM.1680.2","BGM.1680.2","BGM.1680.1","BGM.1683.1","BGM.1683.1","BR.20.DArT.PL22_E11...BGM.1683","BGM.1691.2","BGM.1691.2","BGM.1691.1","BGM.1702","BGM.1702","BR.20.DArT.PL23_C02...BGM.1702","BGM.1722.1","BGM.1722.D..1","BGM.1727.2","BGM.1727.2","BGM.1727.1","BGM.1739.2","BGM.1739.2","BGM.1739.1","BGM.1747.2","BGM.1747.2","BGM.1747.1","BGM.1753.1","BGM.1759.2","BGM.1759.2","BGM.1759.1","BGM.1759.B..1","BGM.1769.2","BGM.1769.2","BGM.1769.1","BGM.1770.1","BGM.1771.2","BGM.1771.2","BGM.1771.1","BGM.1784.2","BGM.1784.2","BGM.1784.1","BGM.1810.1","BGM.1956.2","BGM.1956.2","BGM.1956.1","BGM.2019.2","BGM.2019.2","BGM.2019.1","BGM.2020.1","BGM.2020.1","BGM.2020","BGM.2035.2","BGM.2035.2","BGM.2035.1","BGM.2053.1","BGM.2054.1","BGM.2072.2","BGM.2072.2","BGM.2072.1","BGM.2082.2","BGM.2082.2","BGM.2082.1","BGM.2095.2","BGM.2095.2","BGM.2095.1","BGM.2098","BGM.2098","BGM.2098","BR.20.DArT.PL23_B01...BGM.2098","BR.20.DArT.PL23_B01...BGM.2098","BR.22.DArT.PL22_F06...BGM.2098","BGM.2111","BGM.2111","BR.20.DArT.PL23_E01...BGM.2111","BGM.2119","BGM.2119","BR.20.DArT.PL23_F01...BGM.2119","BR.SET1.18.BGM.2127.1.170","BR.SET2.18.BR.18GS.054.2.212","BR.SET1.18.BR.18GS.063.16.303.1","BR.SET1.18.BR.18GS.094.52.424.1","BR.SET1.18.BR.18GS.107.3.464.1","BR.22.DArT.PL08_C01...BR.21GS.C3.015.25","BR.22.DArT.PL16_B06...BR.21GS.C3.016.21","BR.22.DArT.PL16_D11...BR.21GS.C3.019.5","BR.22.DArT.PL17_G02...BR.21GS.C3.032.48","BR.22.DArT.PL19_C01...BR.21GS.C3.036.29","BR.22.DArT.PL22_D04...BR.21GS.C3.036.39","BR.22.DArT.PL22_G09...BR.21GS.C3.036.4","BR.22.DArT.PL22_H11...BR.21GS.C3.059.62","BR.22.DArT.PL22_A12...BR.21GS.C3.087.3","BR.22.DArT.PL22_B12...BR.21GS.C3.093.5","BR.22.DArT.PL22_C12...BR.21GS.C3.114.4","BR.22.DArT.PL22_D12...BR.21GS.C3.146.32","BR.22.DArT.PL22_E12...BR.21GS.C3.290.2","BR.22.DArT.PL22_F12...BR.21GS.C3.293.10","BR.22.DArT.PL22_A10...BRS.420","BR.SET1.18.BRS.Mulatinha.1.716","Maragojipe.1","BR.20.DArT.PL23_H01...TMEB14"],"INDV2":["Aipim.Abacate.2","BR.20.DArT.PL22_C10...Baianinha","Baianinha.1","Baianinha.1","BGM.0022","BGM.0022.TB","BGM.0022.T.Bco","BGM.0022.T.Bco","BGM.0022.TR","BGM.0022.T.Rx","BGM.0022.T.Rx","BGM.0023.1","BGM.0023","BGM.0023","BGM.0028.1","BGM.0028","BGM.0028","BGM.0032.1","BGM.0032","BGM.0032","BGM.0042.1","BGM.0042","BGM.0042","BGM.0043","BGM.0060.1","BGM.0060","BGM.0060","BGM.0062.1","BGM.0062","BGM.0062","BGM.0069.1","BGM.0069","BGM.0069","BGM.0082","BGM.0088.1","BGM.0088","BGM.0088","BGM.0090","BGM.0096","BGM.0113.RcxCr","BGM.0113.RcxRos","BGM.0115","BGM.0115.TB","BGM.0115.TR","BGM.0124.1","BGM.0124","BGM.0124","BR.20.DArT.PL23_A02...BGM.0135","BGM.0135.1","BGM.0135.1","BGM.0150","BGM.0152","BGM.0162","BGM.0177","BGM.0179.1","BGM.0179","BGM.0179","BGM.0182","BGM.0184.1","BGM.0184","BGM.0184","BGM.0186.1","BGM.0186","BGM.0186","BGM.0187.1","BGM.0187","BGM.0187","BGM.0190.1","BGM.0190","BGM.0190","BGM.0209","BGM.0222.1","BGM.0222","BGM.0222","BGM.0257","BR.20.DArT.PL22_E10...BGM.0260","BGM.0266.1","BGM.0266","BGM.0266","BGM.0290.1","BGM.0290.3","BGM.0290","BGM.0290.3","BGM.0290","BGM.0290","BR.20.DArT.PL23_B02...BGM.0294","BGM.0294.1","BGM.0294.1","BGM.0318.1","BGM.0318","BGM.0318","BGM.0326.1","BGM.0326","BGM.0326","BGM.0362.1","BGM.0362","BGM.0362","BGM.0382.1","BGM.0382","BGM.0382","BGM.0390.1","BGM.0390","BGM.0390","BGM.0406.1","BGM.0406","BGM.0406","BGM.0422.1","BGM.0422","BGM.0422","BGM.0426.1","BGM.0426","BGM.0426","BGM.0428","BGM.0439.1","BGM.0439","BGM.0439","BGM.0452","BGM.0462.1","BGM.0462","BGM.0462","BGM.0465","BGM.0472.1","BGM.0472","BGM.0472","BGM.0500.1","BGM.0500","BGM.0500","BGM.0508.1","BGM.0508","BGM.0508","BGM.0517.1","BGM.0517","BGM.0517","BGM.0533","BGM.0537.1","BGM.0537","BGM.0537","BGM.0542","BGM.0543","BGM.0555.1","BGM.0555","BGM.0555","BGM.0579.1","BGM.0579","BGM.0579","BGM.0593.1","BGM.0593","BGM.0593","BGM.0620.1","BGM.0620","BGM.0620","BGM.0630.1","BGM.0630","BGM.0630","BGM.0655","BGM.0660.1","BGM.0660","BGM.0660","BGM.0662.1","BGM.0662","BGM.0662","BGM.0665.1","BGM.0665","BGM.0665","BGM.0666.1","BGM.0666","BGM.0666","BGM.0673","BGM.0677.1","BGM.0677","BGM.0677","BGM.0678.1","BGM.0678","BGM.0678","BGM.0694.1","BGM.0694","BGM.0694","BGM.0737","BGM.0779.1","BGM.0779","BGM.0779","BGM.0780.1","BGM.0780","BGM.0780","BGM.0805","BGM.0807","BGM.0812.1","BGM.0812","BGM.0812","BGM.0830","BR.20.DArT.PL22_G10...BGM.0830.TB","BGM.0830.TB.1","BGM.0830.TB.1","BGM.0843.1","BGM.0843","BGM.0843","BGM.0846","BGM.0856.1","BGM.0856","BGM.0856","BR.20.DArT.PL22_H10...BGM.0856.CCr","BGM.0856.CCr.1","BGM.0856.CCr.1","BR.20.DArT.PL22_A11...BGM.0856.CRx","BGM.0856.CRx.1","BGM.0856.CRx.1","BGM.0894.1","BGM.0894","BGM.0894","BGM.0905.1","BGM.0905","BGM.0905","BGM.0918.1","BGM.0918","BGM.0918","BR.20.DArT.PL22_B11...BGM.0931.T","BGM.0944","BGM.0955.1","BGM.0955","BGM.0955","BGM.0958.1","BGM.0958","BGM.0958","BGM.0968.1","BGM.0968","BGM.0968","BGM.0972","BGM.0976","BGM.0981.1","BGM.0981","BGM.0981","BGM.0995.1","BGM.0995","BGM.0995","BGM.1015.1","BGM.1015","BGM.1015","BGM.1025","BGM.1037.1","BGM.1037","BGM.1037","BGM.1073.1","BGM.1073","BGM.1073","BGM.1103.1","BGM.1103","BGM.1103","BGM.1111.1","BGM.1111","BGM.1111","BGM.1126.1","BGM.1126","BGM.1126","BGM.1136.1","BGM.1136","BGM.1136","BGM.1143.1","BGM.1143","BGM.1143","BGM.1148","BGM.1175.1","BGM.1175","BGM.1175","BGM.1200.1","BGM.1200","BGM.1200","BGM.1213.1","BGM.1213","BGM.1213","BGM.1223.1","BGM.1223","BGM.1223","BGM.1248.1","BGM.1248","BGM.1248","BGM.1251.1","BGM.1251","BGM.1251","BR.20.DArT.PL22_C11...BGM.1251.RM","BGM.1262","BGM.1262C","BGM.1262E","BGM.1294","BGM.1318.1","BGM.1318","BGM.1318","BGM.1323.1","BGM.1323","BGM.1323","BGM.1328.1","BGM.1328","BGM.1328","BGM.1332.1","BGM.1332","BGM.1332","BGM.1338.1","BGM.1338","BGM.1338","BGM.1366.1","BGM.1366","BGM.1366","BGM.1371","BGM.1393.1","BGM.1393","BGM.1393","BGM.1403","BGM.1415","BGM.1437.1","BGM.1437","BGM.1437","BGM.1453.1","BGM.1453","BGM.1453","BGM.1481.1","BGM.1481","BGM.1481","BGM.1485","BGM.1498.1","BGM.1498","BGM.1498","BGM.1502","BGM.1507","BGM.1515","BGM.1518.1","BGM.1518","BGM.1518","BR.20.DArT.PL22_F12...BGM.1530","BR.22.DArT.PL22_A06...BGM.1530","BR.22.DArT.PL22_A06...BGM.1530","BGM.1535.1","BGM.1535","BGM.1535","BGM.1537.1","BGM.1537","BGM.1537","BGM.1549","BGM.1586.1","BGM.1586","BGM.1586","BGM.1598.1","BGM.1598","BGM.1598","BGM.1604.1","BGM.1604","BGM.1604","BGM.1605","BGM.1610","BGM.1628.1","BGM.1628","BGM.1628","BGM.1649.1","BGM.1649","BGM.1649","BGM.1661.1","BGM.1661","BGM.1661","BGM.1680.1","BGM.1680","BGM.1680","BR.20.DArT.PL22_E11...BGM.1683","BGM.1683","BGM.1683","BGM.1691.1","BGM.1691","BGM.1691","BR.20.DArT.PL23_C02...BGM.1702","BGM.1702.1","BGM.1702.1","BGM.1722","BGM.1722.D.","BGM.1727.1","BGM.1727","BGM.1727","BGM.1739.1","BGM.1739","BGM.1739","BGM.1747.1","BGM.1747","BGM.1747","BGM.1753","BGM.1759.1","BGM.1759","BGM.1759","BGM.1759.B.","BGM.1769.1","BGM.1769","BGM.1769","BGM.1770","BGM.1771.1","BGM.1771","BGM.1771","BGM.1784.1","BGM.1784","BGM.1784","BGM.1810","BGM.1956.1","BGM.1956","BGM.1956","BGM.2019.1","BGM.2019","BGM.2019","BGM.2020","BR.SET1.18.BGM.2020.1.120","BR.SET1.18.BGM.2020.1.120","BGM.2035.1","BGM.2035","BGM.2035","BGM.2053","BGM.2054","BGM.2072.1","BGM.2072","BGM.2072","BGM.2082.1","BGM.2082","BGM.2082","BGM.2095.1","BGM.2095","BGM.2095","BR.20.DArT.PL23_B01...BGM.2098","BR.22.DArT.PL22_F06...BGM.2098","Fecula.Branca","BR.22.DArT.PL22_F06...BGM.2098","Fecula.Branca","Fecula.Branca","BR.20.DArT.PL23_E01...BGM.2111","BGM.2111.1","BGM.2111.1","BR.20.DArT.PL23_F01...BGM.2119","BGM.2119.1","BGM.2119.1","BR.20.DArT.PL22_G11...BGM.2127","BR.SET1.18.BR.18GS.054.2.212","BR.SET1.18.BR.18GS.063.16.303","BR.SET1.18.BR.18GS.094.52.424","BR.SET1.18.BR.18GS.107.3.464","BR.22.DArT.PL01_C03...BR.21GS.C3.015.25","BR.22.DArT.PL01_H04...BR.21GS.C3.016.21","BR.22.DArT.PL01_E06...BR.21GS.C3.019.5","BR.22.DArT.PL02_E09...BR.21GS.C3.032.48","BR.22.DArT.PL03_F06...BR.21GS.C3.036.29","BR.22.DArT.PL03_F07...BR.21GS.C3.036.39","BR.22.DArT.PL03_D04...BR.21GS.C3.036.4","BR.22.DArT.PL05_H08...BR.21GS.C3.059.62","BR.22.DArT.PL07_E04...BR.21GS.C3.087.3","BR.22.DArT.PL07_C10...BR.21GS.C3.093.5","BR.22.DArT.PL09_H03...BR.21GS.C3.114.4","BR.22.DArT.PL11_E04...BR.21GS.C3.146.32","BR.22.DArT.PL20_D09...BR.21GS.C3.290.2","BR.22.DArT.PL21_H01...BR.21GS.C3.293.10","BR.22.DArT.PL22_F07...BRS.420","BRS.Mulatinha","Maragojipe","TMEB14"],"N_NA":[2626,2855,2854,2942,2934,2372,2308,2183,3125,2165,3067,2336,2176,2212,3357,2139,3233,2045,1883,1970,2975,2130,2876,2096,2458,2457,2041,2876,1978,2870,3136,2315,3213,1641,2322,2222,2229,2123,1924,2109,2122,1877,1905,2000,2869,2008,2843,1881,1888,1967,1902,1837,4051,1956,2020,2889,2864,1952,1975,1880,1875,2403,2368,1954,3257,3200,1824,2650,2682,2082,1743,2666,2603,1974,2036,2054,2216,2066,1859,2392,2654,2343,2487,2210,2472,2294,3276,3315,2543,2490,2164,2845,2482,2704,2273,2314,2052,1871,1875,1794,3009,2185,2891,1930,2006,1988,2235,2085,1941,3195,2143,3110,2096,2126,2016,2113,2027,2196,2195,2109,2107,2355,2278,2268,2221,2125,2205,3142,2127,3023,2879,2740,2996,1933,2770,2507,2615,2136,1885,2051,1864,2000,3114,2291,3043,2563,1996,2553,2941,1903,2933,2180,1973,2209,2131,3331,2346,3276,3225,2220,3194,2112,2049,2126,2209,2136,2204,2243,2975,2259,2896,2961,2242,2933,1836,1709,1812,2061,2493,2473,2544,2033,1970,2032,1831,2235,2181,2018,2168,2061,1979,2055,2101,2907,2187,2924,2009,2837,2065,2898,2640,2889,1866,1877,1796,1961,2283,2215,2235,2095,1987,2082,3040,1979,3023,2143,2227,2121,1875,1949,2295,2212,2151,2646,2209,2604,2356,2119,2447,2152,2415,2937,2390,2810,1937,1854,1943,2359,2146,2179,2101,2204,1962,2208,2292,1990,2242,2514,1882,2435,2220,1198,2184,2741,2007,2764,2890,1661,2834,2932,2959,2080,3077,2771,1794,2754,3009,2382,3051,2949,1744,2900,1985,1893,1851,2186,2095,2074,1904,2203,2402,2309,1789,2879,2035,2858,2130,2002,2047,3186,1861,3165,2593,2023,2512,2186,2019,2156,2261,2139,2183,1879,2071,1979,2029,1960,2880,2016,1941,1929,2630,1891,2481,2048,1964,1775,2238,2070,2071,2064,2422,1882,2087,2911,2134,2889,2431,2437,2355,1879,1762,1772,2153,2101,2118,2134,2172,2071,2147,2393,2217,2360,2125,1888,2023,2216,2003,2157,2120,2135,1992,2017,1995,2123,1882,2100,2042,2013,2009,2275,2864,2857,2833,2065,2839,2522,2417,2503,2072,2022,2508,2503,2102,2307,2300,2288,2811,2240,2867,2478,1865,1757,1807,2937,2224,2193,2215,2287,2047,2052,1942,3007,2388,2203,2368,2184,2136,2191,1959,1858,1956,2401,2298,1878,2309,2133,2237,2039,2207,1900,1705,1882,2019,1919,2015,2211,1707,2217,2226,2280,2048,2318,2134,2204,2278,2227,2408,2130,2124,2248,1941,2725,1801,2195,1936,2321,2873,2633,2387,2411,2308,2323,2809,2344,2643,2407,2388,2170,2400,2807,2748,2037,1851],"N_COMMON_CALLED":[10355,10126,10127,10039,10047,10609,10673,10798,9856,10816,9914,10645,10805,10769,9624,10842,9748,10936,11098,11011,10006,10851,10105,10885,10523,10524,10940,10105,11003,10111,9845,10666,9768,11340,10659,10759,10752,10858,11057,10872,10859,11104,11076,10981,10112,10973,10138,11100,11093,11014,11079,11144,8930,11025,10961,10092,10117,11029,11006,11101,11106,10578,10613,11027,9724,9781,11157,10331,10299,10899,11238,10315,10378,11007,10945,10927,10765,10915,11122,10589,10327,10638,10494,10771,10509,10687,9705,9666,10438,10491,10817,10136,10499,10277,10708,10667,10929,11110,11106,11187,9972,10796,10090,11051,10975,10993,10746,10896,11040,9786,10838,9871,10885,10855,10965,10868,10954,10785,10786,10872,10874,10626,10703,10713,10760,10856,10776,9839,10854,9958,10102,10241,9985,11048,10211,10474,10366,10845,11096,10930,11117,10981,9867,10690,9938,10418,10985,10428,10040,11078,10048,10801,11008,10772,10850,9650,10635,9705,9756,10761,9787,10869,10932,10855,10772,10845,10777,10738,10006,10722,10085,10020,10739,10048,11145,11272,11169,10920,10488,10508,10437,10948,11011,10949,11150,10746,10800,10963,10813,10920,11002,10926,10880,10074,10794,10057,10972,10144,10916,10083,10341,10092,11115,11104,11185,11020,10698,10766,10746,10886,10994,10899,9941,11002,9958,10838,10754,10860,11106,11032,10686,10769,10830,10335,10772,10377,10625,10862,10534,10829,10566,10044,10591,10171,11044,11127,11038,10622,10835,10802,10880,10777,11019,10773,10689,10991,10739,10467,11099,10546,10761,11783,10797,10240,10974,10217,10091,11320,10147,10049,10022,10901,9904,10210,11187,10227,9972,10599,9930,10032,11237,10081,10996,11088,11130,10795,10886,10907,11077,10778,10579,10672,11192,10102,10946,10123,10851,10979,10934,9795,11120,9816,10388,10958,10469,10795,10962,10825,10720,10842,10798,11102,10910,11002,10952,11021,10101,10965,11040,11052,10351,11090,10500,10933,11017,11206,10743,10911,10910,10917,10559,11099,10894,10070,10847,10092,10550,10544,10626,11102,11219,11209,10828,10880,10863,10847,10809,10910,10834,10588,10764,10621,10856,11093,10958,10765,10978,10824,10861,10846,10989,10964,10986,10858,11099,10881,10939,10968,10972,10706,10117,10124,10148,10916,10142,10459,10564,10478,10909,10959,10473,10478,10879,10674,10681,10693,10170,10741,10114,10503,11116,11224,11174,10044,10757,10788,10766,10694,10934,10929,11039,9974,10593,10778,10613,10797,10845,10790,11022,11123,11025,10580,10683,11103,10672,10848,10744,10942,10774,11081,11276,11099,10962,11062,10966,10770,11274,10764,10755,10701,10933,10663,10847,10777,10703,10754,10573,10851,10857,10733,11040,10256,11180,10786,11045,10660,10108,10348,10594,10570,10673,10658,10172,10637,10338,10574,10593,10811,10581,10174,10233,10944,11130],"N_DISCORD":[3782,3418,3025,3632,3420,272,251,199,3730,241,3756,226,224,218,3180,335,3268,286,281,249,3309,581,3339,214,2468,993,2513,3354,259,3387,2973,484,2870,169,543,527,205,487,195,181,246,258,291,229,3260,498,3270,303,309,345,357,299,567,233,278,356,327,216,295,296,264,292,328,240,480,499,259,419,560,466,287,321,508,429,406,325,399,365,314,266,349,301,307,260,330,286,3434,3404,288,301,210,244,364,370,270,379,297,391,405,277,3239,272,3291,468,341,369,472,527,489,3355,246,3410,238,218,220,222,204,665,554,667,211,229,414,405,506,495,212,3364,288,3424,3366,3530,3415,2252,3238,3315,3011,451,351,292,342,317,3306,204,3329,2391,300,2418,3601,269,3585,203,215,280,229,3195,238,3225,2875,220,2919,195,222,214,296,207,245,275,2892,254,2901,2535,290,2542,247,284,295,251,176,231,228,257,279,295,295,277,208,227,229,236,227,198,243,3349,246,3346,593,2857,322,2829,3740,3667,191,410,329,263,223,241,226,226,304,314,3088,231,3101,229,241,308,284,277,249,277,242,251,160,235,238,276,295,2265,2279,402,246,366,771,246,820,273,547,334,557,683,734,323,261,224,272,378,238,352,2203,805,2112,3225,227,3249,3485,173,3512,3421,3182,486,3180,3299,216,3295,2941,429,2931,3330,218,3354,301,352,321,378,382,254,188,280,292,239,666,2771,194,2782,352,261,301,3003,343,3042,3049,223,3089,269,204,289,317,262,351,243,277,295,250,293,3281,267,274,244,2886,329,2978,444,436,339,245,263,515,500,220,216,223,3261,212,3273,295,264,239,294,293,294,421,259,396,247,267,199,282,279,206,316,366,2367,2376,273,326,401,254,372,793,350,737,677,224,699,344,336,247,274,3437,3443,3230,271,3268,224,180,264,257,309,503,529,284,262,287,194,2461,262,2466,239,342,280,275,3523,259,270,210,424,261,245,200,2994,3839,2350,3568,697,179,704,349,253,336,1969,1974,249,687,185,696,191,224,455,203,437,300,236,315,2628,234,2614,274,274,217,305,272,277,258,197,273,327,240,369,247,3554,208,364,293,270,354,309,956,301,299,267,421,261,330,291,402,371,325,2860,3161,318,262],"DISCORDANCE":[0.365234,0.337547,0.298706,0.361789,0.3404,0.0256386,0.0235173,0.0184293,0.37845,0.0222818,0.378858,0.0212306,0.0207311,0.0202433,0.330424,0.0308984,0.335248,0.0261522,0.0253199,0.0226137,0.330702,0.0535435,0.33043,0.0196601,0.234534,0.0943558,0.229707,0.331915,0.023539,0.334982,0.301981,0.0453778,0.293817,0.014903,0.0509429,0.0489822,0.0190662,0.0448517,0.0176359,0.0166483,0.022654,0.0232349,0.026273,0.0208542,0.322389,0.0453841,0.322549,0.0272973,0.0278554,0.0313238,0.0322231,0.0268306,0.0634938,0.0211338,0.0253626,0.0352755,0.0323218,0.0195847,0.0268036,0.0266643,0.0237709,0.0276045,0.0309055,0.0217648,0.0493624,0.0510173,0.0232141,0.0405575,0.0543742,0.0427562,0.0255384,0.0311197,0.0489497,0.0389752,0.0370946,0.0297428,0.0370646,0.0334402,0.0282323,0.0251204,0.0337949,0.0282948,0.0292548,0.0241389,0.0314017,0.0267615,0.353838,0.352162,0.0275915,0.0286913,0.0194139,0.0240726,0.03467,0.0360027,0.0252148,0.0355301,0.0271754,0.0351935,0.0364668,0.0247609,0.324809,0.0251945,0.326165,0.0423491,0.0310706,0.0335668,0.0439233,0.0483664,0.0442935,0.342837,0.0226979,0.345456,0.021865,0.0200829,0.0200638,0.0204269,0.0186233,0.0616597,0.0513629,0.0613503,0.0194041,0.0215509,0.0386807,0.0378045,0.047026,0.0455969,0.0196733,0.341905,0.026534,0.343844,0.333201,0.344693,0.342013,0.203838,0.317109,0.316498,0.290469,0.041586,0.031633,0.0267155,0.0307637,0.028868,0.335056,0.0190833,0.334977,0.229507,0.02731,0.231876,0.358665,0.0242824,0.356787,0.0187946,0.0195312,0.0259933,0.021106,0.331088,0.0223789,0.332303,0.29469,0.0204442,0.298253,0.0179409,0.0203074,0.0197144,0.0274786,0.0190871,0.0227336,0.02561,0.289027,0.0236896,0.287655,0.252994,0.0270044,0.252986,0.0221624,0.0251952,0.0264124,0.0229853,0.0167811,0.0219833,0.0218454,0.0234746,0.0253383,0.0269431,0.0264574,0.025777,0.0192593,0.020706,0.0211782,0.0216117,0.0206326,0.0181219,0.0223346,0.33244,0.0227904,0.332704,0.0540467,0.281644,0.029498,0.280571,0.361667,0.363357,0.017184,0.0369236,0.0294144,0.0238657,0.020845,0.0223853,0.0210311,0.0207606,0.0276514,0.02881,0.310633,0.0209962,0.311408,0.0211294,0.0224103,0.028361,0.0255718,0.0251088,0.0233015,0.025722,0.0223453,0.0242864,0.0148533,0.0226462,0.0224,0.0254097,0.0280046,0.209161,0.215692,0.0400239,0.0232273,0.0359847,0.0698117,0.0221084,0.0742888,0.0257014,0.0504845,0.0309202,0.0511949,0.0633757,0.0666122,0.0299824,0.0244176,0.0203803,0.0253282,0.0361135,0.0214434,0.0333776,0.204721,0.0683188,0.19561,0.314941,0.0206853,0.317999,0.345357,0.0152827,0.346112,0.340432,0.317501,0.0445831,0.321082,0.323115,0.0193081,0.322186,0.294926,0.0404755,0.295166,0.331938,0.0194002,0.332705,0.0273736,0.031746,0.028841,0.0350162,0.0350909,0.0232878,0.0169721,0.0259788,0.0276019,0.0223951,0.0595068,0.274302,0.0177234,0.27482,0.0324394,0.0237727,0.0275288,0.306585,0.0308453,0.309902,0.293512,0.0203504,0.295062,0.0249189,0.0186097,0.0266975,0.0295709,0.0241653,0.032506,0.0218879,0.0253896,0.0268133,0.0228269,0.0265856,0.324819,0.0243502,0.0248188,0.0220775,0.278814,0.0296664,0.283619,0.040611,0.0395752,0.0302517,0.0228055,0.0241041,0.0472044,0.0458001,0.0208353,0.0194612,0.02047,0.323833,0.0195446,0.324316,0.0279621,0.0250379,0.022492,0.0264817,0.0261164,0.0262289,0.0388807,0.0238051,0.036454,0.0227713,0.0247016,0.0182401,0.0260292,0.0263506,0.0191379,0.0297524,0.0337141,0.213378,0.216828,0.02536,0.0296958,0.0370473,0.0233864,0.0342984,0.0721631,0.0319227,0.0670854,0.0623503,0.020182,0.0642404,0.0314471,0.0306346,0.0225118,0.0255931,0.339725,0.340083,0.318289,0.0248259,0.322224,0.021417,0.017039,0.0251956,0.0235585,0.028196,0.0480283,0.0504867,0.0261053,0.0245456,0.0268701,0.0181427,0.241986,0.0243925,0.24382,0.0227554,0.0307665,0.0249465,0.0246107,0.350757,0.0240773,0.0250278,0.0195059,0.0396484,0.0238705,0.0224174,0.0181176,0.30018,0.362409,0.218037,0.336191,0.064555,0.0165053,0.0652456,0.0316639,0.0227457,0.0304762,0.186106,0.18478,0.0224264,0.0643741,0.0170538,0.0647803,0.0174557,0.0207908,0.0410613,0.0180028,0.0393729,0.0273673,0.0213343,0.0287252,0.244011,0.0207557,0.242847,0.0254765,0.0256051,0.0198482,0.0286036,0.0250761,0.0257029,0.0241054,0.0183188,0.0258205,0.0301355,0.0221056,0.0343799,0.0223732,0.346529,0.0186047,0.0337475,0.0265278,0.0253283,0.0350218,0.0298608,0.0902398,0.0284768,0.0280146,0.0250516,0.0413881,0.024537,0.0319211,0.0275203,0.0379496,0.0343169,0.0307154,0.281109,0.308903,0.029057,0.02354]},"columns":[{"accessor":"INDV","name":"INDV","type":"character"},{"accessor":"INDV1","name":"INDV1","type":"character"},{"accessor":"INDV2","name":"INDV2","type":"character"},{"accessor":"N_NA","name":"N_NA","type":"numeric"},{"accessor":"N_COMMON_CALLED","name":"N_COMMON_CALLED","type":"numeric"},{"accessor":"N_DISCORD","name":"N_DISCORD","type":"numeric"},{"accessor":"DISCORDANCE","name":"DISCORDANCE","type":"numeric","format":{"cell":{"digits":4,"locales":"en-US"},"aggregated":{"digits":4,"locales":"en-US"}}}],"defaultPageSize":10,"paginationType":"numbers","showPageInfo":true,"minRows":1,"dataKey":"253f8e85ec3abd9ed0cc8f87ca311241","key":"253f8e85ec3abd9ed0cc8f87ca311241"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.2 (2021-11-01)
+Platform: aarch64-apple-darwin20 (64-bit)
+Running under: macOS Big Sur 11.6.6
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.1-arm64/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] reactable_0.2.3 forcats_0.5.1   stringr_1.4.0   dplyr_1.0.9    
+ [5] purrr_0.3.4     readr_2.1.2     tidyr_1.2.0     tibble_3.1.7   
+ [9] ggplot2_3.3.6   tidyverse_1.3.1
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.8.3      lubridate_1.8.0   here_1.0.1        assertthat_0.2.1 
+ [5] rprojroot_2.0.3   digest_0.6.29     utf8_1.2.2        reactR_0.4.4     
+ [9] R6_2.5.1          cellranger_1.1.0  backports_1.4.1   reprex_2.0.1     
+[13] evaluate_0.15     httr_1.4.3        pillar_1.7.0      rlang_1.0.2      
+[17] readxl_1.4.0      rstudioapi_0.13   jquerylib_0.1.4   rmarkdown_2.14   
+[21] htmlwidgets_1.5.4 munsell_0.5.0     broom_0.8.0       compiler_4.1.2   
+[25] httpuv_1.6.5      modelr_0.1.8      xfun_0.30         pkgconfig_2.0.3  
+[29] htmltools_0.5.2   tidyselect_1.1.2  workflowr_1.7.0   fansi_1.0.3      
+[33] crayon_1.5.1      tzdb_0.3.0        dbplyr_2.1.1      withr_2.5.0      
+[37] later_1.3.0       grid_4.1.2        jsonlite_1.8.0    gtable_0.3.0     
+[41] lifecycle_1.0.1   DBI_1.1.2         git2r_0.30.1      magrittr_2.0.3   
+[45] scales_1.2.0      cli_3.3.0         stringi_1.7.6     fs_1.5.2         
+[49] promises_1.2.0.1  xml2_1.3.3        bslib_0.3.1       ellipsis_0.3.2   
+[53] generics_0.1.2    vctrs_0.4.1       tools_4.1.2       glue_1.6.2       
+[57] crosstalk_1.2.0   hms_1.1.1         fastmap_1.1.0     yaml_2.3.5       
+[61] colorspace_2.0-3  rvest_1.0.2       knitr_1.38        haven_2.5.0      
+[65] sass_0.4.1       </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

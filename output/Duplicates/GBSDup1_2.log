@@ -1,0 +1,23 @@
+
+VCFtools - 0.1.16
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--gzvcf output/Duplicates/GBSDuplicatesFile1renamed.vcf
+	--out output/Duplicates/GBSDup1_2
+	--gzdiff output/Duplicates/GBSDuplicatesFile2renamed.vcf
+	--diff-indv-discordance
+
+Using zlib version: 1.2.11
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+After filtering, kept 122 out of 122 Individuals
+Using zlib version: 1.2.11
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+Warning: Expected at least 2 parts in FORMAT entry: ID=PL,Number=.,Type=Float,Description="Normalized, Phred-scaled likelihoods for AA,AB,BB genotypes where A=ref and B=alt; not applicable if site is not biallelic">
+Outputting Discordance By Individual...
+Found 400122 sites common to both files.
+Found 0 sites only in main file.
+Found 0 sites only in second file.
+After filtering, kept 400122 out of a possible 400122 Sites
+Run Time = 14.00 seconds

@@ -1,0 +1,134 @@
+---
+title: "GBSDArT Impution All Clones genotyped both Genotyping Platforms"
+author: "LucianoRogerio"
+date: "2022-06-06"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+### Prepare the Non Reference Population VCF File
+
+```{r , eval = F}
+## Markers in DArT Pop
+system(paste0("vcftools --gzvcf output/DCas22_6902/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz"))
+
+system(paste0("gzcat output/DCas22_6902/DCas22_6902_DArTseqLD_AllSites_AllChrom_raw.vcf.gz |",
+              " tail -n12981 | cut -f 1,2 > output/DArTMkrs.txt"))
+
+## Reference Pop
+system(paste0("vcftools --gzvcf DCas22_6902/DCas22_6902_RefandStudyPopimputedAndFiltered.vcf.gz"))
+### 7,827 Individuals
+### 37,877 Sites - SNP Mkrs
+
+## Study Pop
+system(paste0("vcftools --gzvcf output/DCas22_6902/",
+              "GBSonlysamples_UniqueSites_SelUnfiltered.vcf.gz ",
+              "--exclude-positions output/",
+              "DArTMkrs.txt",
+              " --recode ",
+              "--stdout | bgzip -c -@ 7 > ",
+              "output/DCas22_6902/",
+              "GBSonlysamples_UniqueSites_SelUnfiltered2.vcf.gz"))
+```
+
+Imput GBS NonRef Pop with the DArT + GBS VCF as reference Pop
+```{r Imput GBS NonRef clones, eval = F}
+
+system("ssh lbraatz@cbsumezey03.biohpc.cornell.edu")
+
+system(paste0("scp output/DCas22_6902/GBSonlysamples_UniqueSites_SelUnfiltered2.vcf.gz ",
+       "lbraatz@cbsumezey03.biohpc.cornell.edu:/home/lbraatz/Desktop/Genotyping/DArT/",
+       "EMBRAPA/EMBRAPAImputation2022/output/DCas22_6902/."))
+
+## split the Mkrs per Chromosome
+for(i in 1:18){
+system(paste0("vcftools --gzvcf output/DCas22_6902/",
+              "GBSonlysamples_UniqueSites_SelUnfiltered2.vcf.gz ",
+              "--chr ", i,
+              " --recode --stdout | ",
+              "bgzip -c -@ 60 > ",
+              "output/NonRef/chr", i,
+              "_GBSonlysamples_UniqueSites_SelUnfiltered2.vcf.gz"))
+}
+
+## Imputation of the NonRef GBS Pop
+targetVCFpath <- here::here("output", "NonRef/") # location of the targetVCF
+RefPath <- here::here("output/")
+mapPath <- here::here("data", "CassavaGeneticMapV6updated/")
+outPath <- here::here("output", "DCas22_6902/")
+
+purrr::map(1:18,
+           ~genomicMateSelectR::runBeagle5(targetVCF=paste0(targetVCFpath,"chr",.,
+                                                            "_GBSonlysamples_UniqueSites_SelUnfiltered2.vcf.gz"),
+                                           refVCF=paste0(RefPath,"chr",.,
+                                                         "_GBSandDArTsitesCommonClones_RefPopImputed.vcf.gz"),
+                                           mapFile=paste0(mapPath,"chr",.,
+                                                          "_cassava_cM_pred.v6_91019.map"),
+                                           outName=paste0(outPath,"chr",.,
+                                                          "_GBSonlySamples_Imputed"),
+                                           nthreads=60))
+```
+
+
+#### Concatting the Chromosomes VCFs from the NonReference
+
+```{r Joint all the Chromosome VCF in One VCF, eval = F}
+## Indexing files
+purrr::map(1:18,
+~system(paste0("tabix -f -p vcf output/DCas22_6902/chr",.,
+                  "_GBSonlySamples_Imputed.vcf.gz")))
+
+system(paste0("bcftools concat ",
+              "--output ",
+              "output/DCas22_6902/AllChrGBSandDArTsitesCommonClones_NonRefPopImputed.vcf.gz ",
+              "--output-type z --threads 60 ",
+              paste0("output/DCas22_6902/chr",1:18,
+                     "_GBSonlySamples_Imputed.vcf.gz",
+                     collapse = " ")))
+
+system(paste0("tabix -f -p vcf output/DCas22_6902/",
+              "AllChrGBSandDArTsitesCommonClones_NonRefPopImputed.vcf.gz"))
+system(paste0("tabix -f -p vcf output/",
+              "DCas22_6902AllPopImputed.vcf.gz"))
+```
+
+
+```{r Merging VCF files from Reference and Study Populations, eval = F}
+
+system(paste0("bcftools merge",
+              " --output output/",
+              "AllClonesGBSandDArTImputed.vcf.gz",
+              " --merge snps --output-type z --threads 60",
+              " output/DCas22_6902AllPopImputed.vcf.gz",
+              " output/DCas22_6902/AllChrGBSandDArTsitesCommonClones_NonRefPopImputed.vcf.gz"))
+```
+
+
+#### Post Imputation Filter
+
+```{r Post Imputation Filter, eval = F}
+inPath<-here::here("output/")
+outPath<-here::here("output/")
+ncores <- 60
+nclones <- 10410
+require(furrr); options(mc.cores=ncores); plan(multiprocess)
+genomicMateSelectR::postImputeFilter(inPath=inPath,
+                                     inName=paste0("AllClonesGBSandDArTImputed"),
+                                     outPath=outPath,
+                                     outName=paste0("AllClonesGBSandDArTImputedAndFiltered"),
+                                     DR2thresh = 0, MAFthresh = (1/nclones)*2)
+```
+
+#### Convert VCF to Dosage matrix
+```{r Convert VCF to Dosage matrix, eval = F}
+genomicMateSelectR::convertVCFtoDosage(pathIn = "output/", pathOut = "output/",
+                                       vcfName = "AllClonesGBSandDArTImputedAndFiltered")
+
+snps <- read.table(file = here::here("output", "AllClonesGBSandDArTImputedAndFiltered.raw"),
+                   stringsAsFactor=F, header = T) %>%
+                     dplyr::select(-FID,-PAT,-MAT,-SEX,-PHENOTYPE) %>%
+                     column_to_rownames(var = "IID") %>%
+                     as.matrix()
+saveRDS(snps,file = here::here("output", "AllGBSandDArTClones_ReadyForGP_Dos.rds"))
+```

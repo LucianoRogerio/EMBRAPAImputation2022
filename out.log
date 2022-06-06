@@ -1,0 +1,11 @@
+
+VCFtools - 0.1.16
+(C) Adam Auton and Anthony Marcketta 2009
+
+Parameters as interpreted:
+	--gzvcf output/DCas22_6902/DCas22_6902_RefandStudyPopimputedAndFiltered4GP.vcf.gz
+
+Using zlib version: 1.2.11
+After filtering, kept 4228 out of 4228 Individuals
+After filtering, kept 9096 out of a possible 9096 Sites
+Run Time = 1.00 seconds
